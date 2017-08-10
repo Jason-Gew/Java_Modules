@@ -17,13 +17,23 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 
+/**
+ * PubSubClient based on MQTT (Paho)
+ * @author Jason Gew
+ *
+ */
 public class PubSubClient 
 {
 	private static PubSubClient pubsub_client;
 	private static String Config_Path;
 	
+	private static final String Broker = "tcp://iot.eclipse.org:1883";
+	private static final String ClientID = "Jason/GeW_2017";
+	
 	private Map<String, String> MqttConfig = new HashMap<>();
 	
+	private MqttConnectOptions ConnectOps;
+	private static MqttClient MQTTClient;
 	
 	private PubSubClient(String Config_Path)
 	{
@@ -62,6 +72,16 @@ public class PubSubClient
 		if(pubsub_client == null)
 		{
 			pubsub_client = new PubSubClient(Config_Path);
+			// Load Configuration
+			try
+			{
+				MQTTClient = new MqttClient(Broker, ClientID);
+			}
+			catch(MqttException err) 
+			{
+				// TODO Auto-generated catch block
+				err.printStackTrace();
+			}
 		}
 		return pubsub_client;
 	}
@@ -72,5 +92,11 @@ public class PubSubClient
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 		return Now.format(format);
 	}
+	
+	public void Initialize()
+	{
+		
+	}
+	
 	
 }

@@ -32,7 +32,7 @@ public class Main
 	
 	public static void main(String[] args) 
 	{
-/*		Scanner input_words = new Scanner(System.in);
+		Scanner input_words = new Scanner(System.in);
 		initialize();
 		boolean check = connect();
 		if(check)
@@ -61,11 +61,11 @@ public class Main
 		if(check)
 		{
 			System.out.println("Disconnected with MQTT Broker!");
-		}*/
-		PubSubClient.setConfigPath(config);
-		PubSubClient singleClient = PubSubClient.getInstance();
+		}
+	//	PubSubClient.setConfigPath(config);
+	//	PubSubClient singleClient = PubSubClient.getInstance();
 		
-		System.out.println(singleClient.timestamp());
+	//	System.out.println(singleClient.timestamp());
 	}
 	
 	public static void initialize()
