@@ -9,7 +9,6 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
@@ -32,7 +31,7 @@ public class Main
 	
 	public static void main(String[] args) 
 	{
-		Scanner input_words = new Scanner(System.in);
+/*		Scanner input_words = new Scanner(System.in);
 		initialize();
 		boolean check = connect();
 		if(check)
@@ -61,11 +60,25 @@ public class Main
 		if(check)
 		{
 			System.out.println("Disconnected with MQTT Broker!");
-		}
-	//	PubSubClient.setConfigPath(config);
-	//	PubSubClient singleClient = PubSubClient.getInstance();
+		}*/
 		
-	//	System.out.println(singleClient.timestamp());
+		PubSubClient.setConfigPath(config);
+		PubSubClient singleClient = PubSubClient.getInstance();
+		
+		boolean check = singleClient.Initialize();
+		if(check)
+		{
+			try {
+				singleClient.connect();
+			} catch (MqttException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			singleClient.publish("jason/test123", singleClient.timestamp());
+		
+		}
+		singleClient.disconnect();
+		
 	}
 	
 	public static void initialize()
