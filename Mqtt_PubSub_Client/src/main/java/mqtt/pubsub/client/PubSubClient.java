@@ -26,7 +26,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
-import org.eclipse.paho.client.mqttv3.MqttTopic;
 
 /**
  * PubSubClient based on MQTT (Paho)
@@ -40,13 +39,13 @@ public class PubSubClient
 	
 	
 	private Map<String, Object> MqttConfig = new HashMap<>();
-	private String Broker;
 	private boolean CleanSession;
 	private Boolean Status;
+
 	private MqttConnectOptions ConnectOps;
 	private MqttClient MQTTClient;
 	
-	private BlockingQueue<List<String>> MessageQueue = new LinkedBlockingQueue<>();
+	private BlockingQueue<String[]> MessageQueue = new LinkedBlockingQueue<>();
 	
 	private static final Logger logger = LogManager.getLogger(PubSubClient.class);
 	
@@ -82,7 +81,7 @@ public class PubSubClient
 	 * 
 	 * @return the current Singleton PubSubClient instance.
 	 */
-	public static PubSubClient getInstance()
+	public static final PubSubClient getInstance()
 	{
 		if(pubsub_client == null)
 		{
@@ -120,12 +119,10 @@ public class PubSubClient
 				if(temp.contains("tcp://"))
 				{
 					MqttConfig.put("Broker", temp);
-					Broker = temp;
 				}
 				else
 				{
 					MqttConfig.put("Broker", "tcp://"+temp);
-					Broker = "tcp://"+temp;
 				}
 			}
 			
@@ -216,22 +213,6 @@ public class PubSubClient
 					MqttConfig.put("Subscribe_Qos",1);
 					break;
 			}
-			
-			temp = Config.getProperty("MQTT.Version");
-			if(temp == null || !temp.equals("3.1.1") || !temp.equals("3.1"))
-			{
-				logger.info("Missing \"MQTT.Version\" Key or Invalid Value, System Set to 3.1.1");
-				MqttConfig.put("Version", MqttConnectOptions.MQTT_VERSION_3_1_1);
-			}
-			else if(temp.equals("3.1.1"))
-			{
-				MqttConfig.put("Version", MqttConnectOptions.MQTT_VERSION_3_1_1);
-			}
-			else
-			{
-				logger.info("System set MQTT Version 3.1");
-				MqttConfig.put("Version", MqttConnectOptions.MQTT_VERSION_3_1);
-			}
 		}
 		catch (FileNotFoundException e)
 		{
@@ -245,7 +226,7 @@ public class PubSubClient
 		}
 	}
 	
-	public boolean Initialize()
+	public Boolean Initialize()
 	{
 		if( MQTTClient != null && MQTTClient.isConnected())
 		{
@@ -277,8 +258,8 @@ public class PubSubClient
 				ConnectOps = new MqttConnectOptions();
 				ConnectOps.setCleanSession(CleanSession);
 				ConnectOps.setKeepAliveInterval((int) MqttConfig.get("KeepAlive"));
-				
-				MQTTClient.setCallback(new MessageCallback(Status, MessageQueue));
+					
+				MQTTClient.setCallback(new MessageCallback(MQTTClient, MessageQueue));
 				
 				return true;
 			}
@@ -295,23 +276,27 @@ public class PubSubClient
 		MQTTClient.connect(ConnectOps);
 	}
 	
-	public void disconnect()
+	public boolean disconnect()
 	{
 		try
 		{
 			MQTTClient.disconnect();
+			return true;
 		}
 		catch (MqttException e)
 		{
 			logger.warn("MQTT Client Disconnection Error: " + e.toString());
 			e.printStackTrace();
+			return false;
 		}
 	}
 	
-	public boolean publish(String Topic, String Payload)
+	public boolean publish(final String Topic, final String Payload)
 	{
 		try
 		{
+			if(!MQTTClient.isConnected())
+				MQTTClient.reconnect();
 			MQTTClient.publish(Topic, Payload.getBytes(), (int) MqttConfig.get("Publish_Qos"), false);
 			return true;
 		}
@@ -322,10 +307,12 @@ public class PubSubClient
 		}
 	}
 	
-	public boolean publish(String Topic, String Payload, boolean Retain)
+	public boolean publish(final String Topic, final String Payload, final boolean Retain)
 	{
 		try
 		{
+			if(!MQTTClient.isConnected())
+				MQTTClient.reconnect();
 			MQTTClient.publish(Topic, Payload.getBytes(), (int) MqttConfig.get("Publish_Qos"), Retain);
 			return true;
 		}
@@ -335,4 +322,56 @@ public class PubSubClient
 			return false;
 		}
 	}
+	
+	public void subscribe(final String Topic)
+	{	
+		try
+		{
+			MQTTClient.subscribe(Topic, (int) MqttConfig.get("Subscribe_Qos"));	
+		}
+		catch (MqttException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void subscribe(final String[] Topics)
+	{
+		int[] qos = new int[Topics.length];
+		for(int i = 0; i < Topics.length; i++)
+		{
+			qos[i] = (int) MqttConfig.get("Subscribe_Qos");
+		}
+		try
+		{
+			MQTTClient.subscribe(Topics, qos);
+		}
+		catch (MqttException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean clean_retain(final String Topic)
+	{
+		try
+		{
+			if(!MQTTClient.isConnected())
+				MQTTClient.reconnect();
+			MQTTClient.publish(Topic, "".getBytes(), (int) MqttConfig.get("Publish_Qos"), true);
+			return true;
+		}
+		catch(MqttException err)
+		{
+			logger.error(err.toString());
+			return false;
+		}
+	}
+	public final BlockingQueue<String[]> getMessageQueue()
+	{
+		return MessageQueue;
+	}
+
+	
 }

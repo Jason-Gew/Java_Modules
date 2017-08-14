@@ -1,0 +1,26 @@
+<Configuration status="info" monitorInterval="300">  
+	<properties>  
+        <property name="filename">logs/app.log</property>  
+    </properties>  
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">  
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t]  %logger{36} - %msg%n"/>  
+        </Console>  
+        
+        <File name="LogFile" fileName="${filename}">  
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>  
+        </File>  
+        
+    </Appenders>
+    
+    
+    <Loggers>  
+        <Logger name="mqtt.pubsub.client" level="info" additivity="false">
+     		<AppenderRef ref="Console"/>
+            <AppenderRef ref="LogFile"/>
+        </Logger>  
+        <Root level="info">  
+            <AppenderRef ref="Console"/>  
+        </Root>  
+    </Loggers>  
+</Configuration> 
