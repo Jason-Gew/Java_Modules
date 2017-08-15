@@ -19,8 +19,7 @@ public class MessageCallback implements MqttCallback
 	private int reconnect_trial = 10;
 	private boolean queue_enable;
 	private MqttClient CurrentClient;
-//	private BlockingQueue<List<String>> MessageQueue;		// Producer
-	private BlockingQueue<String[]> MessageQueue;
+	private BlockingQueue<String[]> MessageQueue;	// Producer
 	
 	private static final Logger logger = LogManager.getLogger(MessageCallback.class);
 	
@@ -84,7 +83,15 @@ public class MessageCallback implements MqttCallback
 		if(queue_enable)
 		{
 			String[] data = new String[2];
-			String msg = new String(Message.getPayload(), "UTF-8");
+			String msg = null;
+			try
+			{
+				msg = new String(Message.getPayload(), "UTF-8");
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				logger.error(e.toString());
+			}
 //			System.out.println(timestamp() + ": ["+Topic + "] " + msg);
 			data[0] = Topic;
 			data[1] = msg;
@@ -92,8 +99,16 @@ public class MessageCallback implements MqttCallback
 		}
 		else
 		{
-			String msg = new String(Message.getPayload(), "UTF-8");
-			System.out.println(timestamp() + ": ["+Topic + "] " + msg);
+			String msg = null;
+			try
+			{
+				msg = new String(Message.getPayload(), "UTF-8");
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				logger.error(e.toString());
+			}
+			System.out.println(timestamp() + ": [" + Topic + "] " + msg);
 		}
 		
 	}

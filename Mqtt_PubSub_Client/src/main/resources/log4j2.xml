@@ -9,7 +9,18 @@
         
         <File name="LogFile" fileName="${filename}">  
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>  
-        </File>  
+        </File>
+        
+        <RollingFile name="Rolling-File" fileName="logs/app.log"
+                     filePattern="logs/app-%d{yyyy-MM-dd}(%i).log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingFile>
         
     </Appenders>
     
