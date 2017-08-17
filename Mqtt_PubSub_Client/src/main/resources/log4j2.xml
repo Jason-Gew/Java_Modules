@@ -1,18 +1,19 @@
 <Configuration status="info" monitorInterval="300">  
-	<properties>  
-        <property name="filename">logs/app.log</property>  
+	<properties> 
+		<property name="logdir">logs</property>  
+        <property name="filename">app.log</property>  
     </properties>  
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">  
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t]  %logger{36} - %msg%n"/>  
         </Console>  
         
-        <File name="LogFile" fileName="${filename}">  
+        <File name="Log-File" fileName="${logdir}/system.log">  
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level [%t] %c{1} - %msg%n"/>  
         </File>
         
-        <RollingFile name="Rolling-File" fileName="logs/app.log"
-                     filePattern="logs/app-%d{yyyy-MM-dd}(%i).log">
+        <RollingFile name="Rolling-File" fileName="${logdir}/${filename}"
+                     filePattern="${logdir}/${filename}-%d{yyyy-MM-dd}(%i).log">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1} - %msg%n</Pattern>
             </PatternLayout>
@@ -24,11 +25,10 @@
         
     </Appenders>
     
-    
     <Loggers>  
         <Logger name="mqtt.pubsub.client" level="info" additivity="false">
      		<AppenderRef ref="Console"/>
-            <AppenderRef ref="LogFile"/>
+            <AppenderRef ref="Rolling-File"/>
         </Logger>  
         <Root level="info">  
             <AppenderRef ref="Console"/>  
