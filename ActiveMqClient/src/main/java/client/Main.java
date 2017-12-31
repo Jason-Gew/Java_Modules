@@ -21,7 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Main
 {
 
-    private static final String brokerAddress = "tcp://38.96.192.62:61616";
+    private static final String brokerAddress = "tcp://localhost:61616";
     private static final String username = "admin";
     private static final String password = "admin";
     private static final String queueName = "test";
