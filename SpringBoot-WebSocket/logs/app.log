@@ -1,0 +1,3 @@
+[2018-01-13 00:52:11.343] INFO  [main] ApplicationTests : Starting ApplicationTests on Fantasy with PID 11380 (started by Medivh in E:\Java\server.websocket)
+[2018-01-13 00:52:11.343] INFO  [main] ApplicationTests : No active profile set, falling back to default profiles: default
+[2018-01-13 00:52:14.904] INFO  [main] ApplicationTests : Started ApplicationTests in 3.829 seconds (JVM running for 5.024)
