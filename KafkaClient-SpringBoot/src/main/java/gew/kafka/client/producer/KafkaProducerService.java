@@ -1,6 +1,7 @@
 package gew.kafka.client.producer;
 
 import gew.kafka.client.config.KafkaProducerConfig;
+import gew.kafka.client.entity.KafkaMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class KafkaProducerService implements KfkProducer {
         if(message != null)
         {
             template.send(producerConfig.getTopic(), message);
-            logger.info("Sent Message: " + message);
+            logger.debug("Sent Message: " + message);
         }
         else
         {
@@ -63,16 +64,45 @@ public class KafkaProducerService implements KfkProducer {
 
     @Override
     public void sendMessages(List<String> messages) {
-
+        if(messages != null && !messages.isEmpty())
+        {
+            for(String message : messages)
+            {
+                template.send(producerConfig.getTopic(), message);
+            }
+        }
     }
 
-    @Override
-    public void sendMessages(String topic, List<String> messages) {
-
-    }
 
     @Override
-    public void sendKeyPairedMessages(String topic, List<Map<String, String>> messages) {
+    public void sendKeyPairedMessages(final List<KafkaMessage> messages)
+    {
+        if(messages != null && !messages.isEmpty())
+        {
+            for(KafkaMessage message : messages)
+            {
+                if(message.getKey() != null && message.getTopic() != null && message.getPartition() != null)
+                {
+                    template.send(message.getTopic(), message.getPartition(), message.getKey(), message.getValue());
 
+                }
+                else if(message.getTopic() != null && message.getPartition() != null)
+                {
+                    template.send(message.getTopic(), message.getPartition(), message.getValue());
+                }
+                else if(message.getTopic() != null && message.getKey() != null)
+                {
+                    template.send(message.getTopic(), message.getKey(), message.getValue());
+                }
+                else if(message.getKey() != null)
+                {
+                    template.send(producerConfig.getTopic(), message.getKey(), message.getValue());
+                }
+                else
+                {
+                    template.send(producerConfig.getTopic(), message.getValue());
+                }
+            }
+        }
     }
 }

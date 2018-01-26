@@ -25,6 +25,7 @@
 	</properties>
 
 	<dependencies>
+		<!-- 1.0.X version design for Kafka V 0.9 -->
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
