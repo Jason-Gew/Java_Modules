@@ -1,6 +1,7 @@
 package gew.kafka.client.controller;
 
 import gew.kafka.client.config.KafkaProducerConfig;
+import gew.kafka.client.entity.KafkaMessage;
 import gew.kafka.client.producer.KfkProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,7 +61,7 @@ public class ManualMessageController {
         ZonedDateTime timestamp = ZonedDateTime.now();
         result.put("Timestamp", timestamp.toString());
         logger.info("Get Kafka Message from Post Request: " + message.toString());
-        if(!message.isEmpty() && message.containsKey("Message"))
+        if(!message.isEmpty() && message.containsKey("Message") && message.get("Message") != null && !message.get("Message").isEmpty())
         {
             if(message.containsKey("Key") && message.get("Key")!= null)
                 producer.sendMessage(producerConfig.getTopic(), message.get("Message"), message.get("Key"));
@@ -70,6 +72,38 @@ public class ManualMessageController {
         else
         {
             result.put("Result", "Invalid Message.");
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/sendMessages", produces = "application/json")
+    public ResponseEntity<Map<String, Object>> sendMessages(@RequestBody final List<Map<String, String>> messages)
+    {
+        Map<String, Object> result = new HashMap<>();
+        ZonedDateTime timestamp = ZonedDateTime.now();
+        result.put("Timestamp", timestamp.toString());
+        logger.info("Get Kafka Messages from Post Request: " + messages.toString());
+        if(!messages.isEmpty())
+        {
+            int validMessage = 0;
+            for(Map<String, String> message : messages)
+            {
+                if(!message.containsKey("Message") || message.get("Message") == null || message.get("Message").isEmpty())
+                {
+                    break;
+                }
+                if(message.containsKey("Key") && message.get("Key")!= null)
+                    producer.sendMessage(producerConfig.getTopic(), message.get("Message"), message.get("Key"));
+                else
+                    producer.sendMessage(producerConfig.getTopic(), message.get("Message"));
+                validMessage++;
+            }
+            result.put("Result", "Producer is sending [" + validMessage + "] data...");
+        }
+        else
+        {
+            result.put("Result", "Invalid Message List.");
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);

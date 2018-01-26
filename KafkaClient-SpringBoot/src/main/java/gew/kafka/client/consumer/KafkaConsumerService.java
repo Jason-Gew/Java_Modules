@@ -10,7 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import java.util.Optional;
 
 
-public class KafkaConsumerService implements KfkComsumer{
+public class KafkaConsumerService implements KfkConsumer {
 
     @Autowired
     private KafkaConsumerConfig consumerConfig;
