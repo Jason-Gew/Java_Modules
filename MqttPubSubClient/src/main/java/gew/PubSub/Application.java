@@ -2,6 +2,7 @@ package gew.PubSub;
 
 import gew.PubSub.config.MqttClientConfig;
 import gew.PubSub.entity.DataReceiving;
+import gew.PubSub.mqtt.BasicClient;
 import gew.PubSub.mqtt.Client;
 import gew.PubSub.mqtt.SingletonClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -33,7 +34,7 @@ public class Application
     private static void builderClientTest()
     {
         Boolean status = false;
-        Client client = new Client.Builder()
+        BasicClient client = new Client.Builder()
                 .setBroker(TesTBrokerURL)
                 .setClientID("Jason-Test-Client")
                 .setKeepAlive(60)

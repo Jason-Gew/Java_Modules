@@ -18,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Jason/GeW
  * @since 2018-1-26
  */
-public class Client
+public class Client implements BasicClient
 {
     private String broker;
     private Integer keepAlive;
@@ -46,12 +46,13 @@ public class Client
 
     }
 
-
+    @Override
     public boolean isConnected()
     {
         return mqttClient != null && mqttClient.isConnected();
     }
 
+    @Override
     public Boolean initialize()
     {
         if (mqttClient != null && mqttClient.isConnected()) {
@@ -101,6 +102,7 @@ public class Client
         }
     }
 
+    @Override
     public boolean connect() throws MqttException
     {
         if(connectOps != null)
@@ -117,7 +119,7 @@ public class Client
         }
     }
 
-
+    @Override
     public void disconnect()
     {
         try
@@ -131,11 +133,12 @@ public class Client
         }
     }
 
+    @Override
     public Boolean publish(final String topic, final String payload)
     {
         return publish(topic, payload, pubQos);
     }
-
+    @Override
     public Boolean publish(final String topic, final String payload, final int qos)
     {
         try
@@ -162,17 +165,19 @@ public class Client
      * This method will broadcast the message to all auto publish topics!
      * @param message String message
      */
+    @Override
     public void autoPublish(final String message)
     {
         for(String topic : autoPubTopics)
             publish(topic, message);
     }
 
+    @Override
     public void subscribe(final String topic)
     {
         subscribe(topic, subQos);
     }
-
+    @Override
     public void subscribe(final String topic, final int qos)
     {
         try
@@ -191,12 +196,14 @@ public class Client
     /**
      * This method will subscribe all topics in auto subscribe topics list!
      */
+    @Override
     public void autoSubscribe()
     {
         for(String topic : autoSubTopics)
             subscribe(topic);
     }
 
+    @Override
     public void unsubscribe(final String topic)
     {
         try {
@@ -206,6 +213,7 @@ public class Client
         }
     }
 
+    @Override
     public boolean cleanRetain(final String topic)
     {
         try
@@ -221,7 +229,7 @@ public class Client
         }
     }
 
-
+    @Override
     public BlockingQueue<String[]> getMessageQueue() {
         if(enableOutQueue)
             return messageQueue;
