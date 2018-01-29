@@ -355,14 +355,14 @@ public class Client implements BasicClient
                 client.password = new char[0];
             }
 
-            if(this.pubQos != null && pubQos >= 0 && pubQos <=2 ) {
+            if(this.pubQos != null && this.pubQos >= 0 && this.pubQos <= 2) {
                 client.pubQos = this.pubQos;
             } else {
                 System.err.println("Invalid Default Publish QoS ["+this.pubQos+"], System set to 0");
                 client.pubQos = 0;
             }
 
-            if(this.subQos != null && subQos >= 0 && subQos <=2 ) {
+            if(this.subQos != null && this.subQos >= 0 && this.subQos <= 2) {
                 client.subQos = this.subQos;
             } else {
                 System.err.println("Invalid Default Subscribe QoS ["+this.subQos+"], System set to 0");
