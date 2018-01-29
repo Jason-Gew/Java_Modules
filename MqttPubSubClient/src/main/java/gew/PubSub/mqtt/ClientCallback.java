@@ -19,7 +19,7 @@ import java.util.concurrent.BlockingQueue;
 public class ClientCallback implements MqttCallback
 {
 
-    private static int RECONNECT_TRIAL = 10;
+    private int RECONNECT_TRIAL = 10;
     private boolean queueEnable;
     private MqttClient currentClient;
     private BlockingQueue<String[]> messageQueue;       // Producer
