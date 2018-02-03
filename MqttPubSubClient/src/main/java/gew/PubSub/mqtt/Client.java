@@ -24,6 +24,7 @@ public class Client implements BasicClient
     private Integer keepAlive;
     private boolean cleanSession;
     private String clientID;
+    private boolean autoReconnect;
     private boolean enableLogin;
     private String username;
     private char[] password;
@@ -85,18 +86,24 @@ public class Client implements BasicClient
                     connectOps.setUserName(username);
                     connectOps.setPassword(password);
                 }
-                connectOps.setAutomaticReconnect(true);     // Auto-reconnection must be set true;
+                connectOps.setAutomaticReconnect(autoReconnect);     // Better to set AutomaticReconnect true;
+
                 connectOps.setKeepAliveInterval(keepAlive);
                 if(enableOutQueue) {
 
                     messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
-                    mqttClient.setCallback(new ClientCallback(mqttClient, messageQueue));
+                    ClientCallback callback = new ClientCallback(mqttClient, messageQueue);
+                    callback.setAutoReconnect(autoReconnect);
+                    mqttClient.setCallback(callback);
                 } else {
-                    mqttClient.setCallback(new ClientCallback(mqttClient));
+                    ClientCallback callback = new ClientCallback(mqttClient);
+                    callback.setAutoReconnect(autoReconnect);
+                    mqttClient.setCallback(callback);
                 }
                 return true;
+
             } catch (MqttException err) {
-                logger.fatal(err.getMessage());
+                logger.fatal("=> MQTT Client Initialization Error: " + err.getMessage());
                 return false;
             }
         }
@@ -139,12 +146,15 @@ public class Client implements BasicClient
         return publish(topic, payload, pubQos);
     }
     @Override
-    public Boolean publish(final String topic, final String payload, final int qos)
+    public Boolean publish(final String topic, final String payload, final int qos) // Message will lose if connection break.
     {
         try
         {
-            if(!mqttClient.isConnected() && connectOps != null)
+            // The below mechanism will help connect when connection lost...
+            if(!mqttClient.isConnected() && connectOps != null) {
                 mqttClient.connect(connectOps);
+                logger.info("=> Re-established Connection~");
+            }
 
             mqttClient.publish(topic, payload.getBytes("UTF-8"), qos, false);
             return true;
@@ -156,7 +166,7 @@ public class Client implements BasicClient
         }
         catch(MqttException err)
         {
-            logger.error(err.getMessage());
+            logger.error("=> Exception during publish: " + err.getMessage());
             return false;
         }
     }
@@ -248,6 +258,7 @@ public class Client implements BasicClient
         private Integer keepAlive;
         private Boolean cleanSession;
         private String clientID;
+        private Boolean autoReconnect;
         private Boolean enableLogin;
         private String username;
         private String password;
@@ -276,6 +287,11 @@ public class Client implements BasicClient
 
         public Builder setClientID(String clientID) {
             this.clientID = clientID;
+            return this;
+        }
+
+        public Builder setAutoReconnect(Boolean autoReconnect) {
+            this.autoReconnect = autoReconnect;
             return this;
         }
 
@@ -341,6 +357,11 @@ public class Client implements BasicClient
                 client.clientID = this.clientID;
             else
                 client.clientID = "Default-ClientID:" + System.currentTimeMillis()/1000;
+
+            if(this.autoReconnect != null)
+                client.autoReconnect = this.autoReconnect;
+            else
+                client.autoReconnect = true;
 
             if(this.enableLogin != null)
                 client.enableLogin = this.enableLogin;

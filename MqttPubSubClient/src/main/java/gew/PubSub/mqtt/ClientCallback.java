@@ -18,11 +18,11 @@ import java.util.concurrent.BlockingQueue;
  */
 public class ClientCallback implements MqttCallback
 {
-
-    private int RECONNECT_TRIAL = 10;
     private boolean queueEnable;
     private MqttClient currentClient;
-    private BlockingQueue<String[]> messageQueue;       // Producer
+    private int RECONNECT_TRIAL = 10;
+    private boolean autoReconnect = true;
+    private BlockingQueue<String[]> messageQueue;       // Producer; [0]: Topic, [1]: Payload
 
     private static final Logger logger = LogManager.getLogger(ClientCallback.class);
 
@@ -39,27 +39,32 @@ public class ClientCallback implements MqttCallback
         queueEnable = true;
     }
 
+    public boolean isAutoReconnect() { return autoReconnect; }
+    public void setAutoReconnect(boolean autoReconnect) { this.autoReconnect = autoReconnect; }
+
     @Override
     public void connectionLost(Throwable throwable) {
         logger.info("=> MQTT Connection Lost: " + throwable.getMessage());
-        while(RECONNECT_TRIAL != 0 && !currentClient.isConnected()) {
-            try {
-                logger.info("=> System is trying to reconnect... (" + RECONNECT_TRIAL + ")");
-                currentClient.reconnect();
-                if (currentClient.isConnected()) {
-                    logger.info("=> System Reconnected!");
-                    RECONNECT_TRIAL = 10;
-                    break;
+        if(!autoReconnect) {
+            while(RECONNECT_TRIAL != 0 && !currentClient.isConnected()) {
+                try {
+                    logger.info("=> System is trying to reconnect... (" + RECONNECT_TRIAL + ")");
+                    currentClient.connect();            // or invoke reconnect()
+                    if (currentClient.isConnected()) {
+                        logger.info("=> System Reconnected!");
+                        RECONNECT_TRIAL = 10;
+                        break;
+                    }
+                } catch (MqttException e) {
+//                    RECONNECT_TRIAL++;
+                    logger.error("=> MQTT Reconnect: " + e.toString());
                 }
-            } catch (MqttException e) {
-                RECONNECT_TRIAL++;
-                logger.error("=> MQTT Reconnect: " + e.toString());
-            }
-            RECONNECT_TRIAL--;
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                logger.warn("=> MQTT Reconnection Interrupted: " + e.toString());
+                RECONNECT_TRIAL--;
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    logger.warn("=> MQTT Reconnection Interrupted: " + e.toString());
+                }
             }
         }
     }

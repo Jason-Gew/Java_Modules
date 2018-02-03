@@ -26,16 +26,17 @@ public class Application
     public static void main(String[] args)
     {
 
-        builderClientTest();
-//        singletonClientTest();
+        builderClientExample();
+//        singletonClientExample();
         System.exit(0);
     }
 
-    private static void builderClientTest()
+    private static void builderClientExample()
     {
         Boolean status = false;
         BasicClient client = new Client.Builder()
                 .setBroker(TesTBrokerURL)
+                .setCleanSession(false)
                 .setClientID("Jason-Test-Client")
                 .setKeepAlive(60)
                 .setPubQos(0)
@@ -109,7 +110,7 @@ public class Application
         }
     }
 
-    private static void singletonClientTest()
+    private static void singletonClientExample()
     {
         MqttClientConfig config = new MqttClientConfig();
         config.setBroker(TesTBrokerURL);

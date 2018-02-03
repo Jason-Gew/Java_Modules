@@ -89,28 +89,39 @@ public class SingletonClient
                 }
 
                 connectOps = new MqttConnectOptions();
+
                 if(clientConfig.getCleanSession() == null)
                     clientConfig.setCleanSession(true);
-                connectOps.setCleanSession(clientConfig.getCleanSession());
+                else
+                    connectOps.setCleanSession(clientConfig.getCleanSession());
+
                 if(clientConfig.getEnableLogin() != null && clientConfig.getEnableLogin())
                 {
                     connectOps.setUserName(clientConfig.getUsername());
                     connectOps.setPassword(clientConfig.getPassword().toCharArray());
                 }
-                connectOps.setAutomaticReconnect(true);     // Auto-reconnection must be set true;
+
+                if(clientConfig.getAutoReconnect() != null)
+                    connectOps.setAutomaticReconnect(clientConfig.getAutoReconnect());
+                else
+                    connectOps.setAutomaticReconnect(true);     // Auto-reconnection must be set true;
+
                 if(clientConfig.getKeepAlive() == null || clientConfig.getKeepAlive() <= 15)
                     clientConfig.setKeepAlive(60);
-                connectOps.setKeepAliveInterval(clientConfig.getKeepAlive());
-                if(clientConfig.getEnableOutQueue() != null && clientConfig.getEnableOutQueue()) {
+                else
+                    connectOps.setKeepAliveInterval(clientConfig.getKeepAlive());
 
+                if(clientConfig.getEnableOutQueue() != null && clientConfig.getEnableOutQueue()) {
                     messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
                     mqttClient.setCallback(new ClientCallback(mqttClient, messageQueue));
                 } else {
                     mqttClient.setCallback(new ClientCallback(mqttClient));
                 }
+
                 return true;
+
             } catch (MqttException err) {
-                logger.fatal(err.getMessage());
+                logger.fatal("=> MQTT Client Initialize Error: " + err.getMessage());
                 return false;
             }
         }
@@ -156,8 +167,10 @@ public class SingletonClient
     {
         try
         {
-            if(!mqttClient.isConnected() && connectOps != null)
+            if(!mqttClient.isConnected() && connectOps != null) {
                 mqttClient.connect(connectOps);
+                logger.info("=> Re-established Connection~");
+            }
 
             mqttClient.publish(topic, payload.getBytes("UTF-8"), qos, false);
             return true;

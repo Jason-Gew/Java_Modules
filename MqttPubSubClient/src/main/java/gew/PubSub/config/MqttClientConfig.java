@@ -12,6 +12,7 @@ public class MqttClientConfig
     private Integer keepAlive;
     private Boolean cleanSession;
     private String clientID;
+    private Boolean autoReconnect;
     private Boolean enableLogin;
     private String username;
     private String password;
@@ -32,6 +33,9 @@ public class MqttClientConfig
 
     public String getClientID() { return clientID; }
     public void setClientID(String clientID) { this.clientID = clientID; }
+
+    public Boolean getAutoReconnect() { return autoReconnect; }
+    public void setAutoReconnect(final Boolean autoReconnect) { this.autoReconnect = autoReconnect; }
 
     public Boolean getEnableLogin() { return enableLogin; }
     public void setEnableLogin(Boolean enableLogin) { this.enableLogin = enableLogin; }
