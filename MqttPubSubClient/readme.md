@@ -1,6 +1,6 @@
 ********** MQTT Pub-Sub Client **********
 
-                                                                    						By Jason/GeW
+                                                                    				By Jason/GeW
 
 Provide Singleton MQTT Pub Sub Client based on Paho MQTT Library and another client which supports Builder Design Pattern.
 
