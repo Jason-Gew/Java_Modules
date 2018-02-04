@@ -101,7 +101,7 @@ public class ClientCallback implements MqttCallback
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        if(RECONNECT_TRIAL < 10)
+        if(!autoReconnect && RECONNECT_TRIAL < 10)
             RECONNECT_TRIAL = 10;
     }
 }
