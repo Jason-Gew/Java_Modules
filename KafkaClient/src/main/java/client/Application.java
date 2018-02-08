@@ -16,7 +16,7 @@ import java.util.concurrent.BlockingQueue;
 public class Application
 {
 
-    private static final String server = "10.0.1.100:9092";
+    private static final String server = "localhost:9092";
     private static final String clientId = "Jason-Test-Client";
     private static final String topic = "Jason-Test";
     private static final int retries = 0;
