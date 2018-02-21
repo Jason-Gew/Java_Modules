@@ -21,6 +21,17 @@
             </Policies>
         </RollingFile>
 
+                <RollingFile name="Rolling-Message" fileName="${log-path}/mqtt.log"
+                     filePattern="${log-path}/mqtt-%d{yyyy-MM-dd}_(%i).log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{1}): %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+
         <File name="File-Appender" fileName="${log-path}/Paho-Client.log" >
             <PatternLayout>
                 <pattern>
@@ -36,6 +47,13 @@
             <AppenderRef ref="Rolling-File"/>
             <AppenderRef ref="Console-Appender"/>
         </Logger>
+
+        <!-- MQTT Message Independent Rolling Log File -->
+        <Logger name="gew.PubSub.mqtt.ClientCallback" level="info" additivity="false">
+            <AppenderRef ref="Rolling-Message"/>
+            <AppenderRef ref="Console-Appender"/>
+        </Logger>
+
         <Logger name="org.eclipse.paho.client.mqttv3" level="info" additivity="false">
             <AppenderRef ref="File-Appender"/>
             <AppenderRef ref="Console-Appender"/>
