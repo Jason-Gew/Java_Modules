@@ -10,7 +10,8 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -36,7 +37,7 @@ public class Client implements BasicClient
 
     private MqttClient mqttClient;
     private MqttConnectOptions connectOps;
-    private BlockingQueue<String[]> messageQueue;
+    private Queue<String[]> messageQueue;
 
     private static final String URL_PREFIX = "tcp://";
     private static final Logger logger = LogManager.getLogger(Client.class);
@@ -90,8 +91,8 @@ public class Client implements BasicClient
 
                 connectOps.setKeepAliveInterval(keepAlive);
                 if(enableOutQueue) {
-
-                    messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
+//                    messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
+                    messageQueue = new ConcurrentLinkedQueue<>();     // Instantiate ConcurrentLinkedQueue
                     ClientCallback callback = new ClientCallback(mqttClient, messageQueue);
                     callback.setAutoReconnect(autoReconnect);
                     mqttClient.setCallback(callback);
@@ -240,7 +241,7 @@ public class Client implements BasicClient
     }
 
     @Override
-    public BlockingQueue<String[]> getMessageQueue() {
+    public Queue<String[]> getMessageQueue() {
         if(enableOutQueue)
             return messageQueue;
         else

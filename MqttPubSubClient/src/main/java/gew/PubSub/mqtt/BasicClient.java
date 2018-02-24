@@ -2,7 +2,7 @@ package gew.PubSub.mqtt;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 
 /**
  * Basic Client Methods Definition...
@@ -22,5 +22,5 @@ public interface BasicClient
     void autoSubscribe();
     void unsubscribe(final String topic);
     boolean cleanRetain(final String topic);
-    BlockingQueue<String[]> getMessageQueue();
+    Queue<String[]> getMessageQueue();
 }

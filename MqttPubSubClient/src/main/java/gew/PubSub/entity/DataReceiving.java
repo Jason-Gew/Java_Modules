@@ -3,18 +3,21 @@ package gew.PubSub.entity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * @author Jason/GeW
+ */
 public class DataReceiving implements Runnable
 {
 
-    private BlockingQueue<String[]> messageQ;
+    private Queue<String[]> messageQ;
     private AtomicBoolean controlBit;
 
     private static final Logger logger = LoggerFactory.getLogger(DataReceiving.class);
 
-    public DataReceiving(BlockingQueue<String[]> messageQ) {
+    public DataReceiving(Queue<String[]> messageQ) {
         this.messageQ = messageQ;
         controlBit = new AtomicBoolean(true);
     }
@@ -29,19 +32,21 @@ public class DataReceiving implements Runnable
         while (controlBit.get()) {
             while (!messageQ.isEmpty()) {
                 try {
-                    String[] message = messageQ.take();
+//                    String[] message = messageQ.take();     // Use for BlockingQueue Only
+                    String[] message = messageQ.remove();
+
                     if(message.length == 2)
                     {
                         String topic = message[0];
                         String payload = message[1];
-                        logger.info("> Received Message From Topic [{}] : {}", topic, payload);
+                        logger.info("> Received Message From Topic [{}]:\n{}", topic, payload);
                     }
                     else
                     {
                         logger.warn("-> Message From Invalid Format, Length of Message Array: {}", message.length);
                     }
 
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     logger.warn("-> Reading Data from Queue Got Interrupted...");
                 }
             }

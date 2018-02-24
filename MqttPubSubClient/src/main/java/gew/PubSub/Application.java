@@ -96,7 +96,7 @@ public class Application
                     try
                     {
                         receivingThread.join();
-                        System.out.println("Consumer Thread Joined!");
+                        logger.info("Consumer Thread Joined!");
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -160,6 +160,7 @@ public class Application
             try {
                 receivingThread.join();
                 Thread.sleep(200);
+                logger.info("Consumer Thread Joined!");
             } catch (InterruptedException err) {
                 err.printStackTrace();
             }

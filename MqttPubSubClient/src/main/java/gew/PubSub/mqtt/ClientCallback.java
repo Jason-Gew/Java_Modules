@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -22,7 +23,7 @@ public class ClientCallback implements MqttCallback
     private MqttClient currentClient;
     private int RECONNECT_TRIAL = 10;
     private boolean autoReconnect = true;
-    private BlockingQueue<String[]> messageQueue;       // Producer; [0]: Topic, [1]: Payload
+    private Queue<String[]> messageQueue;       // Producer; [0]: Topic, [1]: Payload
 
     private static final Logger logger = LogManager.getLogger(ClientCallback.class);
 
@@ -32,7 +33,7 @@ public class ClientCallback implements MqttCallback
         queueEnable = false;
     }
 
-    ClientCallback(MqttClient currentClient, BlockingQueue<String[]> messageQueue)
+    ClientCallback(MqttClient currentClient, Queue<String[]> messageQueue)
     {
         this.currentClient = currentClient;
         this.messageQueue = messageQueue;
@@ -83,8 +84,8 @@ public class ClientCallback implements MqttCallback
             data[0] = topic;
             data[1] = msg;
             try {
-                messageQueue.put(data);
-            } catch(InterruptedException err) {
+                messageQueue.add(data);
+            } catch(Exception err) {
                 logger.info(err.toString());
             }
         } else {
@@ -95,7 +96,7 @@ public class ClientCallback implements MqttCallback
             } catch (UnsupportedEncodingException e) {
                 logger.error(e.toString());
             }
-            logger.info("=> [" + topic + "] " + msg);
+            logger.info("=> Message From Topic [{}]:\n{}", topic, msg);
         }
     }
 

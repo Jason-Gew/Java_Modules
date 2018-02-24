@@ -9,7 +9,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -18,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Jason/GeW
  * @since 2017-08-20
  */
-public class SingletonClient
+public class SingletonClient implements BasicClient
 {
 
     private static MqttClientConfig clientConfig;
@@ -26,7 +27,7 @@ public class SingletonClient
 
     private MqttConnectOptions connectOps;
     private MqttClient mqttClient;
-    private BlockingQueue<String[]> messageQueue;
+    private Queue<String[]> messageQueue;
 
     private static final String URL_PREFIX = "tcp://";
     private static final Logger logger = LogManager.getLogger(Client.class);
@@ -112,7 +113,8 @@ public class SingletonClient
                     connectOps.setKeepAliveInterval(clientConfig.getKeepAlive());
 
                 if(clientConfig.getEnableOutQueue() != null && clientConfig.getEnableOutQueue()) {
-                    messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
+                    messageQueue = new LinkedBlockingQueue<>();       // Instantiate LinkedBlockingQueue
+//                    messageQueue = new ConcurrentLinkedQueue<>();     // Instantiate ConcurrentLinkedQueue
                     mqttClient.setCallback(new ClientCallback(mqttClient, messageQueue));
                 } else {
                     mqttClient.setCallback(new ClientCallback(mqttClient));
@@ -258,7 +260,7 @@ public class SingletonClient
         }
     }
 
-    public BlockingQueue<String[]> getMessageQueue() {
+    public Queue<String[]> getMessageQueue() {
         if(clientConfig.getEnableOutQueue() != null && clientConfig.getEnableOutQueue())
             return messageQueue;
         else

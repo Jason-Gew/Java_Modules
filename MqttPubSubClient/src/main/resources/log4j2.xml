@@ -54,6 +54,12 @@
             <AppenderRef ref="Console-Appender"/>
         </Logger>
 
+        <!-- MQTT Message Independent Rolling Log File -->
+        <Logger name="gew.PubSub.entity.DataReceiving" level="info" additivity="false">
+            <AppenderRef ref="Rolling-Message"/>
+            <AppenderRef ref="Console-Appender"/>
+        </Logger>
+
         <Logger name="org.eclipse.paho.client.mqttv3" level="info" additivity="false">
             <AppenderRef ref="File-Appender"/>
             <AppenderRef ref="Console-Appender"/>
