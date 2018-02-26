@@ -30,6 +30,7 @@ public class SingletonClient implements BasicClient
     private Queue<String[]> messageQueue;
 
     private static final String URL_PREFIX = "tcp://";
+    private static final String SSL_PREFIX = "ssl://";
     private static final Logger logger = LogManager.getLogger(Client.class);
 
     private SingletonClient () // Private Constructor for getInstance()
@@ -79,12 +80,15 @@ public class SingletonClient implements BasicClient
             }
         } else {
             try {
+                if(clientConfig.getClientID() == null || clientConfig.getClientID().isEmpty())
+                    clientConfig.setClientID("Default-ClientID:" + System.currentTimeMillis()/1000);
+
                 if(clientConfig.getBroker() == null || clientConfig.getBroker().isEmpty()) {
                     throw new IllegalArgumentException ("Broker Address Cannot Be null or Empty!");
-                } else if(clientConfig.getBroker().contains(URL_PREFIX)) {
-                    if(clientConfig.getClientID() == null || clientConfig.getClientID().isEmpty())
-                        clientConfig.setClientID("Default-ClientID:" + System.currentTimeMillis()/1000);
+                } else if(clientConfig.getBroker().contains(URL_PREFIX) || clientConfig.getBroker().contains(SSL_PREFIX)) {
                     mqttClient = new MqttClient(clientConfig.getBroker(), clientConfig.getClientID());
+                } else if(clientConfig.getEnableSSL() != null && clientConfig.getEnableSSL()) {
+                    mqttClient = new MqttClient(SSL_PREFIX + clientConfig.getBroker(), clientConfig.getClientID());
                 } else {
                     mqttClient = new MqttClient(URL_PREFIX + clientConfig.getBroker(), clientConfig.getClientID());
                 }

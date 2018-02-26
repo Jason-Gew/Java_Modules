@@ -29,6 +29,7 @@ public class Client implements BasicClient
     private boolean enableLogin;
     private String username;
     private char[] password;
+    private boolean enableSSL;
     private int pubQos;
     private int subQos;
     private List<String> autoPubTopics;
@@ -40,6 +41,7 @@ public class Client implements BasicClient
     private Queue<String[]> messageQueue;
 
     private static final String URL_PREFIX = "tcp://";
+    private static final String SSL_PREFIX = "ssl://";
     private static final Logger logger = LogManager.getLogger(Client.class);
 
 
@@ -76,10 +78,14 @@ public class Client implements BasicClient
             }
         } else {
             try {
-                if(broker.contains(URL_PREFIX))
+                if(broker.contains(URL_PREFIX) || broker.contains(SSL_PREFIX)) {
                     mqttClient = new MqttClient(broker, clientID);
-                else
+                } else if(enableSSL) {
+                    mqttClient = new MqttClient(SSL_PREFIX + broker, clientID);
+                } else {
                     mqttClient = new MqttClient(URL_PREFIX + broker, clientID);
+                }
+
                 connectOps = new MqttConnectOptions();
                 connectOps.setCleanSession(cleanSession);
                 if(enableLogin)
@@ -263,6 +269,7 @@ public class Client implements BasicClient
         private Boolean enableLogin;
         private String username;
         private String password;
+        private Boolean enableSSL;
         private Integer pubQos;
         private Integer subQos;
         private List<String> autoPubTopics;
@@ -308,6 +315,11 @@ public class Client implements BasicClient
 
         public Builder setPassword(String password) {
             this.password = password;
+            return this;
+        }
+
+        public Builder setEnableSSL(Boolean enableSSL) {
+            this.enableSSL = enableSSL;
             return this;
         }
 
@@ -375,6 +387,12 @@ public class Client implements BasicClient
                 client.password = this.password.toCharArray();
             } else {
                 client.password = new char[0];
+            }
+
+            if(this.enableSSL != null) {
+                client.enableSSL = this.enableSSL;
+            } else {
+                client.enableSSL = false;
             }
 
             if(this.pubQos != null && this.pubQos >= 0 && this.pubQos <= 2) {

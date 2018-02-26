@@ -31,7 +31,6 @@ public class DataReceiving implements Runnable
     public void run() {
         while (controlBit.get()) {
             while (!messageQ.isEmpty()) {
-                System.err.println("Queue Size: " + messageQ.size());
                 try {
 //                    String[] message = messageQ.take();     // Use for BlockingQueue Only
                     String[] message = messageQ.poll();

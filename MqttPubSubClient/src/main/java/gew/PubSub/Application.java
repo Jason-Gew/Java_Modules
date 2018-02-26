@@ -19,7 +19,7 @@ public class Application
 {
 
     private static final String EXIT = "/exit";
-    private static final String TesTBrokerURL = "iot.eclipse.org:1883";
+    private static final String TesTBrokerURL = "ssl://iot.eclipse.org:8883";
     private static final String DefaultTopic = "Jason-Test-Message";
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
@@ -83,7 +83,6 @@ public class Application
             } catch (InterruptedException err) {
                 err.printStackTrace();
             }
-
 
             Runtime.getRuntime().addShutdownHook(new Thread() {
 
