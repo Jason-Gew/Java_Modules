@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,7 +29,7 @@ public class Producer implements KfkProducer, Runnable
 
     private AtomicBoolean ctrlSignal;
     private KafkaProducer<String, String> producer;
-    private BlockingQueue<String[]> incomingQueue;
+    private Queue<String[]> incomingQueue;
     private static final Logger logger = LoggerFactory.getLogger(Producer.class);
 
     Producer() { }     // Package-private constructor for Builder class to instantiate.
@@ -47,7 +48,8 @@ public class Producer implements KfkProducer, Runnable
         producer = new KafkaProducer<>(properties);
 
         if(enableMessageQueue) {
-            incomingQueue = new LinkedBlockingQueue<>();
+            incomingQueue = new LinkedBlockingQueue<>();        // LinkedBlockingQueue
+//            incomingQueue = new ConcurrentLinkedQueue<>();        // ConcurrentLinkedQueue
             ctrlSignal = new AtomicBoolean(true);
         }
     }
@@ -115,7 +117,7 @@ public class Producer implements KfkProducer, Runnable
     }
 
 
-    public BlockingQueue<String[]> getIncomingQueue() {
+    public Queue<String[]> getIncomingQueue() {
         if(enableMessageQueue && incomingQueue != null) {
             return incomingQueue;
         }
@@ -130,7 +132,9 @@ public class Producer implements KfkProducer, Runnable
             while(ctrlSignal.get()) {
                 if(!incomingQueue.isEmpty()) {
                     try {
-                        String[] message = incomingQueue.take();
+                        String[] message = incomingQueue.poll();
+                        if(message == null)
+                            continue;
                         switch (message.length)
                         {
                             case 1: sendMessage(message[0]);                        //[0]: message
@@ -141,8 +145,6 @@ public class Producer implements KfkProducer, Runnable
                                     break;
                             default: logger.error("Invalid Message Array Length: " + message.length);
                         }
-                    } catch (InterruptedException e) {
-                        logger.warn("Kafka Producer Take Message From Incoming Queue Got Interrupted...");
                     } catch (Exception err) {
                         logger.error("Error in Kafka Producer Queue Mode: " + err.getMessage());
                     }

@@ -6,8 +6,8 @@ import client.consumer.ConsumerBuilder;
 import client.producer.Producer;
 import client.producer.ProducerBuilder;
 
+import java.util.Queue;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * Example for using the library
@@ -80,7 +80,7 @@ public class Application
                 .build();
 
         producer.init();
-        BlockingQueue<String[]> queue = producer.getIncomingQueue();
+        Queue<String[]> queue = producer.getIncomingQueue();
         Scanner input = new Scanner(System.in);
         Thread producerThread = new Thread(producer);
 

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -31,7 +31,7 @@ public class Consumer implements KfkConsumer, Runnable
     Boolean enableMessageQueue;
 
     private AtomicBoolean ctrlSignal;
-    private BlockingQueue<String[]> outputQueue;
+    private Queue<String[]> outputQueue;
     private KafkaConsumer<String, String> consumer;
 
     private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
@@ -60,7 +60,7 @@ public class Consumer implements KfkConsumer, Runnable
         return Instant.now().toString();
     }
 
-    public void setOutputQueue(BlockingQueue<String[]> outputQueue) {
+    public void setOutputQueue(Queue<String[]> outputQueue) {
         this.outputQueue = outputQueue;
     }
 

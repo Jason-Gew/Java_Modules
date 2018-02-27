@@ -4,7 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 
 /**
  * Functions should be implemented in Kafka Consumer/Listener Service.
@@ -18,5 +18,5 @@ public interface KfkConsumer
     void subscribe();
     void subscribe(final List<String> topics);
     void subscribe(final Collection<String> topics, ConsumerRebalanceListener listener);
-    void setOutputQueue(BlockingQueue<String[]> outputQueue);
+    void setOutputQueue(Queue<String[]> outputQueue);
 }

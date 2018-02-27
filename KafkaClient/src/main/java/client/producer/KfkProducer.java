@@ -1,6 +1,6 @@
 package client.producer;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
 
 /**
  * Functions should be implemented in Kafka Producer<String, String>.
@@ -14,5 +14,5 @@ public interface KfkProducer
     boolean sendMessage(final String message);
     boolean sendMessage(final String topic, final String message);
     boolean sendMessage(final String topic, final String message, final String key);
-    BlockingQueue<String[]> getIncomingQueue();
+    Queue<String[]> getIncomingQueue();
 }
