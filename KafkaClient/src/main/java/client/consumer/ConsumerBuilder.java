@@ -76,7 +76,7 @@ public class ConsumerBuilder
         if(this.topic != null && !this.topic.isEmpty()) {
             consumer.topic = this.topic;
         } else {
-            throw new IllegalArgumentException("Invalid Kafka Topic");
+            System.err.println("No Default Topic");
         }
 
         if(this.groupId != null && !this.groupId.isEmpty()) {

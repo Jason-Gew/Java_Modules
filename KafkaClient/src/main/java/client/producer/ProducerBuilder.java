@@ -63,7 +63,7 @@ public class ProducerBuilder
         if(this.topic != null && !this.topic.isEmpty()) {
             producer.topic = this.topic;
         } else {
-            throw new IllegalArgumentException("Invalid Kafka Topic");
+            System.out.println("No Default Topic");
         }
 
         if(this.clientId != null && !this.clientId.isEmpty()) {
