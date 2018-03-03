@@ -25,7 +25,7 @@ public class Main
     private static final String username = "admin";
     private static final String password = "admin";
     private static final String queueName = "test";
-    private static final String topic = "test2";
+    private static final String topic = "example2";
 
     private static final String exitKey = "/exit";
 
@@ -33,12 +33,12 @@ public class Main
 
     public static void main(String[] args)
     {
-        logger.info("---- Start ----");
-//        test1();
-        test2();
+        logger.info("-------- Start --------");
+//        example1();
+        example2();
     }
 
-    public static void test1()
+    public static void example1()
     {
         BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>();
 
@@ -87,7 +87,7 @@ public class Main
         System.exit(0);
     }
 
-    public static void test2()
+    public static void example2()
     {
         BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>();
 

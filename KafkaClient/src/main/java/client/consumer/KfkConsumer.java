@@ -19,4 +19,10 @@ public interface KfkConsumer
     void subscribe(final List<String> topics);
     void subscribe(final Collection<String> topics, ConsumerRebalanceListener listener);
     void setOutputQueue(Queue<String[]> outputQueue);
+
+    static int getPollingTimeout() { return 1000; }
+    static void setPollingTimeout(int pollingTimeout) {  }
+
+    static int getIdlePeriod() { return 10; }
+    static void setIdlePeriod(int idlePeriod) {  }
 }

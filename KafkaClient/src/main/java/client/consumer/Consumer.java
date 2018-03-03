@@ -34,9 +34,18 @@ public class Consumer implements KfkConsumer, Runnable
     private Queue<String[]> outputQueue;
     private KafkaConsumer<String, String> consumer;
 
+    private static int IDLE_PERIOD = 50;
+    private static int POLLING_TIMEOUT = 1000;
+
     private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
 
     Consumer() { }      // Package-private constructor for Builder class to instantiate.
+
+    public static int getIdlePeriod() { return IDLE_PERIOD; }
+    public static void setIdlePeriod(int idlePeriod) { IDLE_PERIOD = idlePeriod; }
+
+    public static int getPollingTimeout() { return POLLING_TIMEOUT; }
+    public static void setPollingTimeout(int pollingTimeout) { POLLING_TIMEOUT = pollingTimeout; }
 
     @Override
     public void init()
@@ -67,7 +76,9 @@ public class Consumer implements KfkConsumer, Runnable
     @Override
     public void subscribe() {
         if(consumer != null) {
-            if(topic.contains(",") && topic.length() > 1) {
+            if(topic == null || topic.isEmpty()) {
+                throw new IllegalStateException("No Default Topic(s) for Subscription!");
+            } else if(topic.contains(",") && topic.length() > 1) {
                 String[] topics = topic.split(",");
                 List<String> topicArray = Arrays.asList(topics);
                 consumer.subscribe(topicArray);
@@ -78,6 +89,7 @@ public class Consumer implements KfkConsumer, Runnable
             throw new IllegalStateException("Kafka Consumer Has Not Been Initialized!");
         }
     }
+
 
     @Override
     public void subscribe(final List<String> topics) {
@@ -103,9 +115,9 @@ public class Consumer implements KfkConsumer, Runnable
             subscribe();                // Auto Subscribe to Default topics
             while (ctrlSignal.get()) {
                 try{
-                    ConsumerRecords<String, String> records = consumer.poll(1000);
+                    ConsumerRecords<String, String> records = consumer.poll(POLLING_TIMEOUT);
                     if(records.isEmpty()) {
-                        Thread.sleep(100);
+                        Thread.sleep(IDLE_PERIOD);
                         continue;
                     }
 

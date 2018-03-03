@@ -1,6 +1,15 @@
 package client.consumer;
 
-import javax.jms.*;
+import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.ExceptionListener;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
@@ -28,7 +37,7 @@ public class Receiver implements Runnable, MessageListener, ExceptionListener
 
 
     private static final Logger logger = LoggerFactory.getLogger(Receiver.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
 
     public Receiver(String brokerAddress, String queueName) {

@@ -116,6 +116,25 @@ public class Producer implements KfkProducer, Runnable
         return status;
     }
 
+    @Override
+    public boolean sendKeyPairedMessage(String key, String message) {
+        boolean status = false;
+        try {
+            if(producer != null && message != null) {
+                ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, message);
+                producer.send(record);
+                status = true;
+            } else if (producer == null) {
+                logger.error("Kafka Producer Has Not Been Initialized...");
+            } else {
+                logger.error("Invalid Topic or Message!");
+            }
+        } catch (Exception err) {
+            logger.error("Kafka Producer Send Error: " + err.getMessage());
+        }
+        return status;
+    }
+
 
     public Queue<String[]> getIncomingQueue() {
         if(enableMessageQueue && incomingQueue != null) {
@@ -148,13 +167,14 @@ public class Producer implements KfkProducer, Runnable
                     } catch (Exception err) {
                         logger.error("Error in Kafka Producer Queue Mode: " + err.getMessage());
                     }
-                } else {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        logger.error("Kafka Producer Idle Got Interrupted: " + e.getMessage());
-                    }
                 }
+//                else {
+//                    try {
+//                        Thread.sleep(10);         // Only uncomment when necessary
+//                    } catch (InterruptedException e) {
+//                        logger.error("Kafka Producer Idle Got Interrupted: " + e.getMessage());
+//                    }
+//                }
             }
         } else {
             throw new IllegalStateException("Kafka Producer or MessageQueue Has Not Been Initialized!");
@@ -166,6 +186,7 @@ public class Producer implements KfkProducer, Runnable
         if(producer != null && enableMessageQueue) {
             ctrlSignal.set(false);
         }
+        close();
     }
 
     @Override

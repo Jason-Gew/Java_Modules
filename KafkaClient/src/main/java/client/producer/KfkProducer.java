@@ -14,5 +14,6 @@ public interface KfkProducer
     boolean sendMessage(final String message);
     boolean sendMessage(final String topic, final String message);
     boolean sendMessage(final String topic, final String message, final String key);
+    boolean sendKeyPairedMessage(final String key, final String message);
     Queue<String[]> getIncomingQueue();
 }

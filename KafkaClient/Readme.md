@@ -4,7 +4,7 @@
                                                                        By Jason/GeW
 
 
-The Basic Kafka Client (Producer and Consumer) based on Kafka-Client V1.0.0.
+The Basic Kafka Client (Producer and Consumer) based on Apache Kafka-Client V1.0.0.
 
 Support independent thread for both producer and consumer, and utilize internal message queue for buffering passing data.
 

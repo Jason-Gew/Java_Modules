@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ActiveMqClient.iml" filepath="$PROJECT_DIR$/ActiveMqClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/activemq.iml" filepath="$PROJECT_DIR$/activemq.iml" />
     </modules>
   </component>
 </project>

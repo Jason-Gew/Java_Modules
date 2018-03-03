@@ -9,6 +9,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
 import org.slf4j.Logger;
@@ -33,12 +34,12 @@ public class Publisher implements Runnable
     private boolean persist;
 
     private boolean enableQueue;
-    private BlockingQueue<String> messageQueue;
+    private Queue<String> messageQueue;
     private String message;
     private boolean signal = true;
 
     private static final Logger logger = LoggerFactory.getLogger(Publisher.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     public Publisher(String brokerAddress, String topic) {
         this.brokerAddress = brokerAddress;
@@ -62,7 +63,7 @@ public class Publisher implements Runnable
     public boolean isPersist() { return persist; }
     public void setPersist(final boolean persist) { this.persist = persist; }
 
-    public void setMessageQueue(BlockingQueue<String> messageQueue) { this.messageQueue = messageQueue; }
+    public void setMessageQueue(Queue<String> messageQueue) { this.messageQueue = messageQueue; }
 
     /**
      * Single Message for sending to the Queue, support multi-threading.
@@ -119,12 +120,12 @@ public class Publisher implements Runnable
                 if(!messageQueue.isEmpty())
                 {
                     try {
-                        message = messageQueue.take();
-                        TextMessage msg = session.createTextMessage(message);
-                        producer.send(msg);
+                        message = messageQueue.poll();
+                        if(message != null) {
+                            TextMessage msg = session.createTextMessage(message);
+                            producer.send(msg);
+                        }
 
-                    } catch (InterruptedException e) {
-                       logger.error("=> ActiveMQ Publisher from Queue Got Interrupted...");
                     } catch (JMSException e) {
                         logger.error("=> ActiveMQ Publisher Send Failed: {}", e.getMessage());
                     } catch (NullPointerException err) {
