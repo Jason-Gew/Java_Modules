@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="3600" >
+    <Properties>
+        <Property name="log-path">logs</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1}: %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+
+        <RollingFile name="Rolling-File" fileName="${log-path}/WebCam.log"
+                     filePattern="${log-path}/WebCam-%d{yyyy-MM-dd}_(%i).log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{1}): %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Logger name="gew.photo" level="info" additivity="false">
+            <AppenderRef ref="Rolling-File"/>
+            <AppenderRef ref="Console-Appender"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="Console-Appender"/>
+        </Root>
+
+    </Loggers>
+</Configuration>
