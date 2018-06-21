@@ -20,6 +20,7 @@ public class AutoProcess implements Runnable {
 
     private Camera camera;
     private String localPath;
+    private String staticName;
     private boolean removeFileAfterFinished;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss");
@@ -44,6 +45,14 @@ public class AutoProcess implements Runnable {
         this.removeFileAfterFinished = removeFileAfterFinished;
     }
 
+    public String getStaticName() {
+        return staticName;
+    }
+
+    public void setStaticName(String staticName) {
+        this.staticName = staticName;
+    }
+
     private String timestamp() {
         return LocalDateTime.now().format(FORMATTER);
     }
@@ -54,7 +63,13 @@ public class AutoProcess implements Runnable {
             if (!camera.isOpen()) {
                 camera.open();
             }
-            String image = camera.take(localPath + timestamp());
+            String image = null;
+            if (staticName == null || staticName.isEmpty()) {
+                image = camera.take(localPath + timestamp());
+            } else {
+                image = camera.take(localPath + staticName);
+            }
+
             if (image != null) {
 
                 /* Further Process Code */

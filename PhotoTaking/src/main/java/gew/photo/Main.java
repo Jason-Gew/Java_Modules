@@ -1,7 +1,6 @@
 package gew.photo;
 
 import java.awt.Dimension;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -12,19 +11,18 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.sarxos.webcam.Webcam;
 import gew.photo.camera.Camera;
+import gew.photo.camera.ImageNaming;
 import gew.photo.config.AppConfig;
 import gew.photo.entity.AutoProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class Main
-{
+public class Main {
+
     private static final String EXIT_SYMBOL = "/exit";
     private static final String TAKE_IMAGE = "/take";
     private static final String STATUS = "/status";
-
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss-SSS");
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
@@ -61,7 +59,6 @@ public class Main
                 break;
             default:
                 dimension = new Dimension(640, 480);
-
         }
         return dimension;
     }
@@ -81,7 +78,7 @@ public class Main
         try{
             num = Integer.parseInt(selection.trim());
             if(num < 0 || num > cameras.size() - 1) {
-                System.out.println("\nInvalid Web-Camera Number!!!");
+                System.out.println("\nInvalid Web-Camera Number !!!");
                 System.exit(1);
             }
         } catch (NumberFormatException err) {
@@ -97,19 +94,24 @@ public class Main
             logger.error("Initialize Web Camera Failed: " + e.getMessage());
         }
 
+        camera.setDefaultImageFormat(AppConfig.getImageFormat());
         camera.setCustomerResolutions();
-        camera.setImageSize(new Dimension(960, 720));
+        camera.setImageSize(AppConfig.getResolution());
 
         logger.info("-> Web-Camera Has Been Initialized!");
 
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-        AutoProcess autoProcess = new AutoProcess(camera, AppConfig.getStoragePath());
-        executor.scheduleAtFixedRate(autoProcess, 5, AppConfig.getCapturePeriod(), TimeUnit.SECONDS);
+        if (AppConfig.getEnableScheduler()) {
+            ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+            AutoProcess autoProcess = new AutoProcess(camera, AppConfig.getStoragePath());
+            if (!AppConfig.getImageNaming().equalsIgnoreCase(ImageNaming.TIMESTAMP.value())) {
+                autoProcess.setStaticName(AppConfig.getImageNaming());
+            }
+            executor.scheduleAtFixedRate(autoProcess, 5, AppConfig.getCapturePeriod(), TimeUnit.SECONDS);
+            logger.info("-> Scheduler Thread Begins Running...");
+        }
 
-        logger.info("-> Scheduler Thread Begins Running...");
         ExecutorService pool = Executors.newFixedThreadPool(1);
         manualProcess(scanner, camera, pool);
-
     }
 
     private static void manualProcess(Scanner scanner, Camera camera, ExecutorService pool) {
@@ -126,6 +128,9 @@ public class Main
                     System.exit(0);
                 } else if (input.equalsIgnoreCase(TAKE_IMAGE)) {
                     AutoProcess autoProcess = new AutoProcess(camera, AppConfig.getStoragePath());
+                    if (!AppConfig.getImageNaming().equalsIgnoreCase(ImageNaming.TIMESTAMP.value())) {
+                        autoProcess.setStaticName(AppConfig.getImageNaming());
+                    }
                     pool.submit(autoProcess);
                 } else if (input.equalsIgnoreCase(STATUS)) {
                     if (camera.isOpen()) {

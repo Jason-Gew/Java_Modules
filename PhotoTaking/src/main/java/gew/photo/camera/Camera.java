@@ -20,13 +20,12 @@ public class Camera implements ICamera
     private Dimension defaultDimension;
     private String defaultPhotoFormat;
 
-    private static Camera instance;
+    private volatile static Camera instance;
     private static final Logger logger = LoggerFactory.getLogger(Camera.class);
 
     private Camera() { }
 
-    public static Camera getInstance()
-    {
+    public static Camera getInstance() {
         if (instance == null) {
             synchronized (Camera.class) {
                 if (instance == null) {
@@ -87,7 +86,7 @@ public class Camera implements ICamera
 
     public void setCustomerResolutions() {
         Dimension[] customerResolutions = new Dimension[] {
-                new Dimension(960, 720),    // 960 * 720
+                new Dimension(960, 720),     // 960 * 720
                 WebcamResolution.XGA.getSize(),         // 1024 * 768
                 WebcamResolution.HD.getSize(),          // 1280 * 720
                 WebcamResolution.HDP.getSize(),         // 1600 * 900
@@ -126,8 +125,9 @@ public class Camera implements ICamera
             BufferedImage image = take();
             ImageIO.write(image, defaultPhotoFormat, file);
             source = file.getAbsolutePath();
+            logger.info("-> Image [ {} ] Has Been Saved...", file.getName());
         } catch (IOException err) {
-            logger.error("-> Save Image to {} Failed: {}", file.getName(), err.getMessage());
+            logger.error("-> Save Image to {} Failed: {}", file.getAbsoluteFile(), err.getMessage());
         }
         return source;
     }
