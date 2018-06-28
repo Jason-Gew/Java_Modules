@@ -169,7 +169,7 @@ public class AppConfig {
                 Files.createDirectory(path);
             }
 
-            enableScheduler = Boolean.parseBoolean(prop.getProperty("camera.enableSheduler", "false"));
+            enableScheduler = Boolean.parseBoolean(prop.getProperty("camera.enableScheduler", "false"));
 
             capturePeriod = Integer.parseInt(prop.getProperty("camera.capturePeriod", "60"));
             if (capturePeriod < 20) {

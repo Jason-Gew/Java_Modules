@@ -115,7 +115,7 @@ public class Main {
     }
 
     private static void manualProcess(Scanner scanner, Camera camera, ExecutorService pool) {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 String input;
                 input = scanner.nextLine();
