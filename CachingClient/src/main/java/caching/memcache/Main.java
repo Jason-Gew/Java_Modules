@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public class Main {
 
-    private static final String ADDRESS = "10.0.1.80:11211";
+    private static final String ADDRESS = "localhost:11211";
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
