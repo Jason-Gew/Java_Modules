@@ -5,14 +5,18 @@ import caching.memcache.client.MClientConfig;
 import caching.memcache.client.MClientImpl;
 import caching.memcache.model.Message;
 import caching.memcache.util.ObjectEncoder;
+import caching.memcache.util.UniqueTranscoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.rubyeye.xmemcached.exception.MemcachedException;
+import net.rubyeye.xmemcached.transcoders.Transcoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author Jason/GeW
@@ -39,12 +43,12 @@ public class Main {
         }
 
         /* Get Normal String Value */
-//        getString(cache, "test");
+        getString(cache, "test2");
 
         /* Set JSON Value in String */
         Message message = new Message(123, "Hello World!", Instant.now().toString(),
                 Arrays.asList("Test", "Message", "List"));
-//        setJson(cache, "test3", message);
+        setJson(cache, "test3", message);
 
         /* Set Serialize Object and Encode */
         setSerializedObject(cache, "test9", message);
@@ -55,17 +59,24 @@ public class Main {
         //  According to the test, storing Object content in JSON format occupies less memory, then byte array.
         //  Keep object serialized and encoded to String by Base64 occupies the highest memory.
 
+        //  Get the value from memcached which is set by the C# Enyim client. It does not support GZIP Flag,
+        //  So that we have to re-write StringTranscoder or Any Unique Transcoder which extends PrimitiveTypeTranscoder.
+        getValueByUniqueTranscoder(cache, "test01", new UniqueTranscoder());
+
         cache.close();
     }
 
     private static void getString(MClient cache, String key) {
-
         try {
             Optional<String> result2 = cache.get(key);
             result2.ifPresent(System.out::println);
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            if (e instanceof NullPointerException) {
+                logger.error("Value for Key [{}] Does Not Exist... ", key);
+            } else {
+                logger.error("Get Value Error: " + e.getMessage());
+            }
         }
 
     }
@@ -103,10 +114,25 @@ public class Main {
                 Message message = (Message) ObjectEncoder.decodeFromByteArray(value.get());
                 logger.info("Get Message: " + message.toString());
             }
+        } catch (Exception e) {
+            if (e instanceof NullPointerException) {
+                logger.error("Value for Key [{}] Does Not Exist...", key);
+            } else {
+                logger.error(e.getMessage());
+            }
+        }
+    }
 
+    private static void getValueByUniqueTranscoder(MClient cache, String key, Transcoder transcoder) {
+        try {
+            Optional<Object> value = cache.get(key, transcoder);
+            if (value.isPresent()) {
+                System.out.println(value.get());
+            } else {
+                logger.warn("Value for Key [{}] Does Not Exist!", key);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-
     }
 }
