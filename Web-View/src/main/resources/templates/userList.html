@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Current User List</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    </head>
+    <body>
+        <h1>Current User List</h1>
+        <br/>
+        <h3>
+            <a th:href="@{/addUser}">Add A New User</a>
+        </h3>
+        <br/><br/>
+        <div>
+            <table border="1">
+                <tr>
+                    <th>System ID</th>
+                    <th>System Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email Address</th>
+                </tr>
+                <!--/*@thymesVar id="users" type="gew.webview.model.User"*/-->
+                <tr th:each ="user : ${users}">
+                    <td th:utext="${user.id}">...</td>
+                    <td th:utext="${user.userName}">...</td>
+                    <td th:utext="${user.firstName}">...</td>
+                    <td th:utext="${user.lastName}">...</td>
+                    <td th:utext="${user.email}">...</td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

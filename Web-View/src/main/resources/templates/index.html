@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>User Web View</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    </head>
+    <body>
+        <h1>
+            --- Simple User Web View ---
+        </h1>
+        <p  th:text="${#temporals.format(localDateTime, 'yyyy-MM-dd HH:mm:ss  z')}" style="text-align: center"></p>
+        <br/>
+        <h2 th:utext="${welcome}">..!..</h2>
+        <br/>
+
+        <h3>
+            <a th:href="@{/userList}">Show Users</a>
+        </h3>
+
+        <script>
+            var display=setInterval(function(){Time()},0);
+            function Time()
+            {
+                var date = new Date();
+                var time = date.toLocaleTimeString();
+                document.getElementById("example").innerHTML=time;
+                document.getElementById("current-datetime").innerHTML = date.toDateString();
+            }
+        </script>
+
+    </body>
+
+</html>

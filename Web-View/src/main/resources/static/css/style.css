@@ -1,0 +1,38 @@
+h1 {
+    text-align: center;
+    color: #000026;
+}
+
+h2 {
+    text-align: center;
+    color: #ff541a;
+}
+
+h3 {
+    text-align: center;
+    color: #1c6bff;
+}
+
+table {
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+.textBox{
+    margin: 0 auto;
+    text-align: center;
+    width: 500px;
+}
+
+.labalName {
+    padding-left: inherit;
+}
+
+table th, table td {
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
+    padding: 5px;
+}

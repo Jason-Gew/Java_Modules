@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Register A New User</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    </head>
+    <body>
+        <h1>Register A New User</h1>
+        <br/>
+
+
+        <!--/*@thymesVar id="newUser" type="gew.webview.model.User"*/-->
+        <form th:action="@{/addUser}"
+              th:object="${newUser}" method="POST">
+            <div class="textBox">
+                <label for="username" class="labalName">User Name: </label>
+                <br/>
+                <input type="text" style="width: 200px;" th:field="*{userName}" id="username" />
+                <br/>
+
+                <label for="firstName" class="labalName">First Name: </label>
+                <br/>
+                <input type="text" style="width: 200px;" th:field="*{firstName}" id="firstName"/>
+                <br/>
+
+                <label for="lastName" class="labalName">Last Name: </label>
+                <br/>
+                <input type="text" style="width: 200px;" th:field="*{lastName}" id="lastName"/>
+                <br/>
+
+                <label for="email" class="labalName">Email: </label>
+                <br/>
+                <input type="text" style="width: 200px;" th:field=" *{email}" id="email"/>
+                <br/>
+                <br/>
+                <input type="submit" value="Register" />
+
+            </div>
+        </form>
+        <br/>
+        <br/>
+        <!-- Check if errorMessage is not null and not empty -->
+
+        <div class="regError" th:if="${result}" th:utext="${result}"
+             style="text-align: center; color:red; font-size: 150%; font-style:italic;">
+            ...
+        </div>
+
+        <h3>
+            <a th:href="@{/userList}">Show Users</a>
+        </h3>
+
+    </body>
+</html>
