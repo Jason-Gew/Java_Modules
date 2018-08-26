@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="48" >
+    <Properties>
+        <Property name="log-path">logs</Property>
+        <Property name="app-name">JsonLogging</Property>
+        <Property name="kafka-topic">Jason-Test</Property>
+        <Property name="kafka-server">localhost:9092</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1}: %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+
+<!--        message             %m
+            level/severity	    %p
+            exception	        %ex
+            thread	            %t
+            logger	            %c
+            method	            %M
+
+            ThreadContext       %X{YOUR_KEY}
+            System Properties   ${sys:YOUR_KEY}
+-->
+
+        <RollingFile name="Rolling-File" fileName="${log-path}/${app-name}.log"
+                     filePattern="${log-path}/${app-names}-%d{yyyy-MM-dd}_(%i).log">
+            <!--<PatternLayout>-->
+                <!--<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{1}): %msg%n</Pattern>-->
+            <!--</PatternLayout>-->
+
+            <!--<PatternLayout>-->
+                <!--<Pattern>{"timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}", "ip":"${sys:ip}", "mac":"${sys:mac}", "level":"%-5level", "thread":"%t", "class":"%c{10}", "message":"%msg"}%n</Pattern>-->
+            <!--</PatternLayout>-->
+
+            <JSONLayout complete="false" compact="false"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <Kafka name="Kafka-Appender" topic="${kafka-topic}" key="${app-name}" syncSend="false">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <JSONLayout complete="false" compact="false"/>
+            <Property name="bootstrap.servers">${kafka-server}</Property>
+
+        </Kafka>
+
+    </Appenders>
+
+    <Loggers>
+        <Logger name="gew.logging" level="info" additivity="false">
+            <AppenderRef ref="Rolling-File"/>
+            <AppenderRef ref="Console-Appender"/>
+            <AppenderRef ref="Kafka-Appender"/>
+        </Logger>
+
+
+        <Root level="info">
+            <AppenderRef ref="Console-Appender"/>
+        </Root>
+
+    </Loggers>
+</Configuration>

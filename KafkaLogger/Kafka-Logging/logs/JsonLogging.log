@@ -1,0 +1,56 @@
+{
+  "thread" : "main",
+  "level" : "INFO",
+  "loggerName" : "gew.logging.Main",
+  "message" : "Example Logging Started @ 2018-08-25 21:46:58 CDT",
+  "endOfBatch" : false,
+  "loggerFqcn" : "org.apache.logging.log4j.spi.AbstractLogger",
+  "instant" : {
+    "epochSecond" : 1535251618,
+    "nanoOfSecond" : 842000000
+  },
+  "threadId" : 1,
+  "threadPriority" : 5
+}
+{
+  "thread" : "main",
+  "level" : "INFO",
+  "loggerName" : "gew.logging.Main",
+  "message" : "All Threads Start!",
+  "endOfBatch" : false,
+  "loggerFqcn" : "org.apache.logging.log4j.spi.AbstractLogger",
+  "instant" : {
+    "epochSecond" : 1535251679,
+    "nanoOfSecond" : 966000000
+  },
+  "threadId" : 1,
+  "threadPriority" : 5
+}
+{
+  "thread" : "Consumer-1",
+  "level" : "INFO",
+  "loggerName" : "gew.logging.service.IndependentConsumer",
+  "message" : "Consumer Get Message [UserMessage(messageId=1, level=5, timestamp=2018-08-25 21:47:59 CDT, message=User MSG [1])] @ 2018-08-25 21:47:59 CDT",
+  "endOfBatch" : false,
+  "loggerFqcn" : "org.apache.logging.log4j.spi.AbstractLogger",
+  "instant" : {
+    "epochSecond" : 1535251679,
+    "nanoOfSecond" : 971000000
+  },
+  "threadId" : 15,
+  "threadPriority" : 5
+}
+{
+  "thread" : "Producer-1",
+  "level" : "INFO",
+  "loggerName" : "gew.logging.service.IndependentProducer",
+  "message" : "Put User Message UserMessage(messageId=1, level=5, timestamp=2018-08-25 21:47:59 CDT, message=User MSG [1]) : true",
+  "endOfBatch" : false,
+  "loggerFqcn" : "org.apache.logging.log4j.spi.AbstractLogger",
+  "instant" : {
+    "epochSecond" : 1535251680,
+    "nanoOfSecond" : 68000000
+  },
+  "threadId" : 16,
+  "threadPriority" : 5
+}
