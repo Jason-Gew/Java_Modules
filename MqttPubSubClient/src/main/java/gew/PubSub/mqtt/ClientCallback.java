@@ -27,14 +27,12 @@ public class ClientCallback implements MqttCallback
 
     private static final Logger logger = LogManager.getLogger(ClientCallback.class);
 
-    public ClientCallback(MqttClient currentClient)
-    {
+    public ClientCallback(MqttClient currentClient) {
         this.currentClient = currentClient;
         queueEnable = false;
     }
 
-    ClientCallback(MqttClient currentClient, Queue<String[]> messageQueue)
-    {
+    ClientCallback(MqttClient currentClient, Queue<String[]> messageQueue) {
         this.currentClient = currentClient;
         this.messageQueue = messageQueue;
         queueEnable = true;
@@ -46,8 +44,8 @@ public class ClientCallback implements MqttCallback
     @Override
     public void connectionLost(Throwable throwable) {
         logger.info("=> MQTT Connection Lost: " + throwable.getMessage());
-        if(!autoReconnect) {
-            while(RECONNECT_TRIAL != 0 && !currentClient.isConnected()) {
+        if (!autoReconnect) {
+            while (RECONNECT_TRIAL != 0 && !currentClient.isConnected()) {
                 try {
                     logger.info("=> System is trying to reconnect... (" + RECONNECT_TRIAL + ")");
                     currentClient.connect();            // or invoke reconnect()
@@ -72,8 +70,7 @@ public class ClientCallback implements MqttCallback
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-        if(queueEnable)
-        {
+        if (queueEnable) {
             String[] data = new String[2];
             String msg = null;
             try {
@@ -102,7 +99,7 @@ public class ClientCallback implements MqttCallback
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        if(!autoReconnect && RECONNECT_TRIAL < 10)
+        if (!autoReconnect && RECONNECT_TRIAL < 10)
             RECONNECT_TRIAL = 10;
     }
 }

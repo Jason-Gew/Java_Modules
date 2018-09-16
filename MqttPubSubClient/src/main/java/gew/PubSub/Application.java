@@ -15,24 +15,22 @@ import java.util.Scanner;
 /**
  * @author Jason/GeW
  */
-public class Application
-{
+public class Application {
 
     private static final String EXIT = "/exit";
     private static final String TesTBrokerURL = "ssl://iot.eclipse.org:8883";
     private static final String DefaultTopic = "Jason-Test-Message";
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
 
         builderClientExample();
 //        singletonClientExample();
         System.exit(0);
     }
 
-    private static void builderClientExample()
-    {
+    private static void builderClientExample() {
+
         Boolean status = false;
         BasicClient client = new Client.Builder()
                 .setBroker(TesTBrokerURL)
@@ -55,8 +53,8 @@ public class Application
         } catch (MqttException e) {
             logger.error("MQTT Client Initialize/Connect Exception: " + e.getMessage());
         }
-        if(status)
-        {
+
+        if (status) {
             client.autoSubscribe();
             DataReceiving receiving = new DataReceiving(client.getMessageQueue());
 
@@ -84,33 +82,27 @@ public class Application
                 err.printStackTrace();
             }
 
-            Runtime.getRuntime().addShutdownHook(new Thread() {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                System.err.println("Console Terminate the System...");
 
-                @Override
-                public void run()
+                receiving.stop();
+                try
                 {
-                    System.err.println("Console Terminate the System...");
-
-                    receiving.stop();
-                    try
-                    {
-                        receivingThread.join();
-                        logger.info("Consumer Thread Joined!");
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
+                    receivingThread.join();
+                    logger.info("Consumer Thread Joined!");
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-            });
+
+            }));
 
         } else {
             logger.error("MQTT Client Connect Failed......");
         }
     }
 
-    private static void singletonClientExample()
-    {
+    private static void singletonClientExample() {
         MqttClientConfig config = new MqttClientConfig();
         config.setBroker(TesTBrokerURL);
         config.setSubQos(0);
@@ -143,11 +135,10 @@ public class Application
 
             receivingThread.start();
 
-            while (true)
-            {
+            while (true) {
                 System.out.print(": ");
                 String message = inputWords.nextLine();
-                if(message.equals(EXIT)) {
+                if (message.equals(EXIT)) {
                     break;
                 } else {
                     client.publish(DefaultTopic, message);

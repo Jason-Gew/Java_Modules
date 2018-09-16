@@ -19,8 +19,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Jason/GeW
  * @since 2018-1-26
  */
-public class Client implements BasicClient
-{
+public class Client implements BasicClient {
+
     private String broker;
     private Integer keepAlive;
     private boolean cleanSession;
@@ -44,21 +44,17 @@ public class Client implements BasicClient
     private static final String SSL_PREFIX = "ssl://";
     private static final Logger logger = LogManager.getLogger(Client.class);
 
-
-    private Client()        // Private Constructor, Invoked by Builder
-    {
-
-    }
+    // Private Constructor, Invoked by Builder
+    private Client() { }
 
     @Override
-    public boolean isConnected()
-    {
+    public boolean isConnected() {
         return mqttClient != null && mqttClient.isConnected();
     }
 
     @Override
-    public Boolean initialize()
-    {
+    public Boolean initialize() {
+
         if (mqttClient != null && mqttClient.isConnected()) {
             logger.error("MQTT client has been initialized, please disconnect first then re-initialize.");
             return false;
@@ -78,9 +74,9 @@ public class Client implements BasicClient
             }
         } else {
             try {
-                if(broker.contains(URL_PREFIX) || broker.contains(SSL_PREFIX)) {
+                if (broker.contains(URL_PREFIX) || broker.contains(SSL_PREFIX)) {
                     mqttClient = new MqttClient(broker, clientID);
-                } else if(enableSSL) {
+                } else if (enableSSL) {
                     mqttClient = new MqttClient(SSL_PREFIX + broker, clientID);
                 } else {
                     mqttClient = new MqttClient(URL_PREFIX + broker, clientID);
@@ -88,15 +84,14 @@ public class Client implements BasicClient
 
                 connectOps = new MqttConnectOptions();
                 connectOps.setCleanSession(cleanSession);
-                if(enableLogin)
-                {
+                if (enableLogin) {
                     connectOps.setUserName(username);
                     connectOps.setPassword(password);
                 }
                 connectOps.setAutomaticReconnect(autoReconnect);     // Better to set AutomaticReconnect true;
 
                 connectOps.setKeepAliveInterval(keepAlive);
-                if(enableOutQueue) {
+                if (enableOutQueue) {
 //                    messageQueue = new LinkedBlockingQueue<>();     // Instantiate LinkedBlockingQueue
                     messageQueue = new ConcurrentLinkedQueue<>();     // Instantiate ConcurrentLinkedQueue
                     ClientCallback callback = new ClientCallback(mqttClient, messageQueue);
@@ -117,10 +112,8 @@ public class Client implements BasicClient
     }
 
     @Override
-    public boolean connect() throws MqttException
-    {
-        if(connectOps != null)
-        {
+    public boolean connect() throws MqttException {
+        if (connectOps != null) {
             mqttClient.connect(connectOps);
             try {
                 Thread.sleep(200);
@@ -134,45 +127,36 @@ public class Client implements BasicClient
     }
 
     @Override
-    public void disconnect()
-    {
-        try
-        {
+    public void disconnect() {
+        try {
             mqttClient.disconnect();
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             logger.warn("=> MQTT Client Disconnection Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     @Override
-    public Boolean publish(final String topic, final String payload)
-    {
+    public Boolean publish(final String topic, final String payload) {
         return publish(topic, payload, pubQos);
     }
+
     @Override
-    public Boolean publish(final String topic, final String payload, final int qos) // Message will lose if connection break.
-    {
-        try
-        {
+    public Boolean publish(final String topic, final String payload, final int qos) {
+        // Message will lose if connection break.
+        try {
             // The below mechanism will help connect when connection lost...
-            if(!mqttClient.isConnected() && connectOps != null) {
+            if (!mqttClient.isConnected() && connectOps != null) {
                 mqttClient.connect(connectOps);
                 logger.info("=> Re-established Connection~");
             }
 
             mqttClient.publish(topic, payload.getBytes("UTF-8"), qos, false);
             return true;
-        }
-        catch(UnsupportedEncodingException err)
-        {
+        } catch (UnsupportedEncodingException err) {
             logger.error("UnSupported String Format: " + err.getMessage());
             return false;
-        }
-        catch(MqttException err)
-        {
+        } catch (MqttException err) {
             logger.error("=> Exception during publish: " + err.getMessage());
             return false;
         }
@@ -183,29 +167,25 @@ public class Client implements BasicClient
      * @param message String message
      */
     @Override
-    public void autoPublish(final String message)
-    {
-        for(String topic : autoPubTopics)
+    public void autoPublish(final String message) {
+        for (String topic : autoPubTopics)
             publish(topic, message);
     }
 
     @Override
-    public void subscribe(final String topic)
-    {
+    public void subscribe(final String topic) {
         subscribe(topic, subQos);
     }
+
     @Override
-    public void subscribe(final String topic, final int qos)
-    {
-        try
-        {
+    public void subscribe(final String topic, final int qos) {
+        try {
             if(qos < 0 || qos > 2)
                 mqttClient.subscribe(topic, subQos);
             else
                 mqttClient.subscribe(topic, qos);
-        }
-        catch (MqttException e)
-        {
+
+        } catch (MqttException e) {
             logger.error("=> Subscribe Topic [{}] Failed: {}", topic, e.toString());
         }
     }
@@ -214,15 +194,12 @@ public class Client implements BasicClient
      * This method will subscribe all topics in auto subscribe topics list!
      */
     @Override
-    public void autoSubscribe()
-    {
-        for(String topic : autoSubTopics)
-            subscribe(topic);
+    public void autoSubscribe() {
+        autoSubTopics.forEach(this::subscribe);
     }
 
     @Override
-    public void unsubscribe(final String topic)
-    {
+    public void unsubscribe(final String topic) {
         try {
             mqttClient.unsubscribe(topic);
         } catch (MqttException e) {
@@ -231,11 +208,10 @@ public class Client implements BasicClient
     }
 
     @Override
-    public boolean cleanRetain(final String topic)
-    {
+    public boolean cleanRetain(final String topic) {
         try
         {
-            if(!mqttClient.isConnected() && connectOps != null)
+            if (!mqttClient.isConnected() && connectOps != null)
                 mqttClient.connect(connectOps);
 
             mqttClient.publish(topic, "".getBytes(), pubQos, true);
@@ -248,7 +224,7 @@ public class Client implements BasicClient
 
     @Override
     public Queue<String[]> getMessageQueue() {
-        if(enableOutQueue)
+        if (enableOutQueue)
             return messageQueue;
         else
             throw new IllegalStateException("Message Queue has not been enabled!");
@@ -259,8 +235,8 @@ public class Client implements BasicClient
      * Client Builder class for easy instantiation and auto setting default parameters.
      * @author Jason/GeW
      */
-    public static class Builder
-    {
+    public static class Builder {
+
         private String broker;
         private Integer keepAlive;
         private Boolean cleanSession;
@@ -350,76 +326,76 @@ public class Client implements BasicClient
 
         public Client build() {
             Client client = new Client();
-            if(this.broker != null && !this.broker.isEmpty()) {
+            if (this.broker != null && !this.broker.isEmpty()) {
                 client.broker = this.broker;
             } else {
                 throw new IllegalArgumentException("Broker Address Cannot Be null or Empty!");
             }
 
-            if(this.cleanSession != null)
+            if (this.cleanSession != null)
                 client.cleanSession = this.cleanSession;
             else
                 client.cleanSession = true;
 
-            if(this.keepAlive != null && this.keepAlive > 15)
+            if (this.keepAlive != null && this.keepAlive > 15)
                 client.keepAlive = this.keepAlive;
             else
                 client.keepAlive = 60;
 
-            if(this.clientID != null && !this.clientID.isEmpty())
+            if (this.clientID != null && !this.clientID.isEmpty())
                 client.clientID = this.clientID;
             else
                 client.clientID = "Default-ClientID:" + System.currentTimeMillis()/1000;
 
-            if(this.autoReconnect != null)
+            if (this.autoReconnect != null)
                 client.autoReconnect = this.autoReconnect;
             else
                 client.autoReconnect = true;
 
-            if(this.enableLogin != null)
+            if (this.enableLogin != null)
                 client.enableLogin = this.enableLogin;
             else
                 client.enableLogin = false;
 
             client.username = this.username;
 
-            if(this.password != null) {
+            if (this.password != null) {
                 client.password = this.password.toCharArray();
             } else {
                 client.password = new char[0];
             }
 
-            if(this.enableSSL != null) {
+            if (this.enableSSL != null) {
                 client.enableSSL = this.enableSSL;
             } else {
                 client.enableSSL = false;
             }
 
-            if(this.pubQos != null && this.pubQos >= 0 && this.pubQos <= 2) {
+            if (this.pubQos != null && this.pubQos >= 0 && this.pubQos <= 2) {
                 client.pubQos = this.pubQos;
             } else {
                 System.err.println("Invalid Default Publish QoS ["+this.pubQos+"], System set to 0");
                 client.pubQos = 0;
             }
 
-            if(this.subQos != null && this.subQos >= 0 && this.subQos <= 2) {
+            if (this.subQos != null && this.subQos >= 0 && this.subQos <= 2) {
                 client.subQos = this.subQos;
             } else {
                 System.err.println("Invalid Default Subscribe QoS ["+this.subQos+"], System set to 0");
                 client.subQos = 0;
             }
 
-            if(this.autoPubTopics != null)
+            if (this.autoPubTopics != null)
                 client.autoPubTopics = this.autoPubTopics;
             else
                 client.autoPubTopics = new ArrayList<>();
 
-            if(this.autoSubTopics != null)
+            if (this.autoSubTopics != null)
                 client.autoSubTopics = this.autoSubTopics;
             else
                 client.autoSubTopics = new ArrayList<>();
 
-            if(this.enableOutQueue != null)
+            if (this.enableOutQueue != null)
                 client.enableOutQueue = this.enableOutQueue;
             else
                 client.enableOutQueue = false;
