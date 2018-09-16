@@ -14,62 +14,54 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 
 @ControllerAdvice
-public class ControllerExceptionHandler
-{
+public class ControllerExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<RESTResponse> argumentErrorHandler(MethodArgumentNotValidException err)
-    {
-        RESTResponse response = new RESTResponse(400, Status.FAIL, err.getMessage(),null);
+    public ResponseEntity<RestResponse> argumentErrorHandler(MethodArgumentNotValidException err) {
+        RestResponse response = new RestResponse(400, Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<RESTResponse> requestParameterErrorHandler(MissingServletRequestParameterException err)
-    {
-        RESTResponse response = new RESTResponse(400,  Status.FAIL, err.getMessage(),null);
+    public ResponseEntity<RestResponse> requestParameterErrorHandler(MissingServletRequestParameterException err) {
+        RestResponse response = new RestResponse(400,  Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestPartException.class)
-    public ResponseEntity<RESTResponse> missingRequestPartHandler(MissingServletRequestPartException err)
-    {
-        RESTResponse response = new RESTResponse(404, Status.FAIL, err.getMessage(), null);
+    public ResponseEntity<RestResponse> missingRequestPartHandler(MissingServletRequestPartException err) {
+        RestResponse response = new RestResponse(404, Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
-    public ResponseEntity<RESTResponse> unsatisfiedRequestParameterHandler(UnsatisfiedServletRequestParameterException err)
-    {
-        RESTResponse response = new RESTResponse(400,  Status.FAIL, err.getMessage(), null);
+    public ResponseEntity<RestResponse> unsatisfiedRequestParameterHandler(UnsatisfiedServletRequestParameterException err) {
+        RestResponse response = new RestResponse(400,  Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<RESTResponse>  methodNotSupportedErrorHandler(HttpRequestMethodNotSupportedException err)
-    {
-        RESTResponse response = new RESTResponse(405, Status.FAIL, err.getMessage(),null);
+    public ResponseEntity<RestResponse>  methodNotSupportedErrorHandler(HttpRequestMethodNotSupportedException err) {
+        RestResponse response = new RestResponse(405, Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<RESTResponse> requestMessageUnreadableHandler(HttpMessageNotReadableException err)
-    {
-        RESTResponse response = new RESTResponse(400, Status.FAIL,
+    public ResponseEntity<RestResponse> requestMessageUnreadableHandler(HttpMessageNotReadableException err) {
+        RestResponse response = new RestResponse(400, Status.FAIL,
                 err.getMessage(),null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<RESTResponse> mediaTypeNotSupportedErrorHandler(HttpMediaTypeNotSupportedException err)
-    {
-        RESTResponse response = new RESTResponse(415, Status.FAIL, err.getMessage(),null);
+    public ResponseEntity<RestResponse> mediaTypeNotSupportedErrorHandler(HttpMediaTypeNotSupportedException err) {
+        RestResponse response = new RestResponse(415, Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<RESTResponse> noHandlerFoundErrorHandler(NoHandlerFoundException err)
-    {
-        RESTResponse response = new RESTResponse(404, Status.FAIL, err.getMessage(),null);
+    public ResponseEntity<RestResponse> noHandlerFoundErrorHandler(NoHandlerFoundException err) {
+        RestResponse response = new RestResponse(404, Status.FAIL, err.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
