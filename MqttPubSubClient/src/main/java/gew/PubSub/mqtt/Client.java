@@ -10,7 +10,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Queue;
@@ -74,8 +73,12 @@ public class Client implements BasicClient {
             }
         } else {
             try {
-                if (broker.contains(URL_PREFIX) || broker.contains(SSL_PREFIX)) {
+                if (broker.contains(URL_PREFIX)) {
                     mqttClient = new MqttClient(broker, clientID);
+                    enableSSL = false;
+                } else if (broker.contains(SSL_PREFIX)) {
+                    mqttClient = new MqttClient(broker, clientID);
+                    enableSSL = true;
                 } else if (enableSSL) {
                     mqttClient = new MqttClient(SSL_PREFIX + broker, clientID);
                 } else {
@@ -340,7 +343,7 @@ public class Client implements BasicClient {
             } else {
                 String mac = NetworkInfo.getMacAddress();
                 try {
-                    MessageDigest md5 = MessageDigest.getInstance("MD5");
+                    MessageDigest md5 = MessageDigest.getInstance("SHA-1");
                     md5.update(mac.getBytes());
                     mac = Base64.getEncoder().encodeToString(md5.digest());
                 } catch (NoSuchAlgorithmException e) {

@@ -83,7 +83,7 @@ public class SingletonClient implements BasicClient {
                 if (clientConfig.getClientID() == null || clientConfig.getClientID().isEmpty()) {
                     String mac = NetworkInfo.getMacAddress();
                     try {
-                        MessageDigest md5 = MessageDigest.getInstance("MD5");
+                        MessageDigest md5 = MessageDigest.getInstance("SHA-1");
                         md5.update(mac.getBytes());
                         mac = Base64.getEncoder().encodeToString(md5.digest());
                     } catch (NoSuchAlgorithmException e) {
@@ -95,8 +95,12 @@ public class SingletonClient implements BasicClient {
 
                 if (clientConfig.getBroker() == null || clientConfig.getBroker().isEmpty()) {
                     throw new IllegalArgumentException ("Broker Address Cannot Be null or Empty!");
-                } else if (clientConfig.getBroker().contains(URL_PREFIX) || clientConfig.getBroker().contains(SSL_PREFIX)) {
+                } else if (clientConfig.getBroker().contains(URL_PREFIX)) {
                     mqttClient = new MqttClient(clientConfig.getBroker(), clientConfig.getClientID());
+                    clientConfig.setEnableSSL(false);
+                } else if (clientConfig.getBroker().contains(SSL_PREFIX)) {
+                    mqttClient = new MqttClient(clientConfig.getBroker(), clientConfig.getClientID());
+                    clientConfig.setEnableSSL(true);
                 } else if (clientConfig.getEnableSSL() != null && clientConfig.getEnableSSL()) {
                     mqttClient = new MqttClient(SSL_PREFIX + clientConfig.getBroker(), clientConfig.getClientID());
                 } else {

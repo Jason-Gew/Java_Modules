@@ -27,15 +27,15 @@ public class Application {
 
     private static final String EXIT = "/exit";
     private static final String TEST_FILE_PATH = "files/testing.jpg";
-    private static final String TEST_BROKER_URL = "tcp://iot.eclipse.org:1883";
+    private static final String TEST_BROKER_URL = "ssl://iot.eclipse.org:8883";
     private static final String DEFAULT_STRING_TOPIC = "Jason/Message/String/";
     private static final String DEFAULT_FILE_TOPIC = "Jason/Message/File/#";
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
 
-        builderClientExample();
-//        singletonClientExample();
+//        builderClientExample();
+        singletonClientExample();
 //        singletonClientSendingFile(TEST_FILE_PATH);
         System.exit(0);
     }
@@ -113,6 +113,7 @@ public class Application {
         config.setSubQos(1);
         config.setPubQos(1);
         config.setMaxInFlight(20);
+        config.setEnableSSL(true);
 //        config.setClientID("Jason-Test-123");
         config.setEnableOutQueue(true);
 
