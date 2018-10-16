@@ -2,18 +2,19 @@
 <Configuration monitorInterval="3600">
     <Properties>
         <Property name="log-path">logs</Property>
+        <Property name="app-name">PubSubClient</Property>
     </Properties>
     <Appenders>
         <Console name="Console-Appender" target="SYSTEM_OUT">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1}: %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{3}: %msg%n</Pattern>
             </PatternLayout>
         </Console>
 
-        <RollingFile name="Rolling-File" fileName="${log-path}/client.log"
-                     filePattern="${log-path}/client-%d{yyyy-MM-dd}_(%i).log">
+        <RollingFile name="Rolling-File" fileName="${log-path}/${app-name}.log"
+                     filePattern="${log-path}/${app-name}-%d{yyyy-MM-dd}_(%i).log">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1} : %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{3} : %msg%n</Pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -21,10 +22,10 @@
             </Policies>
         </RollingFile>
 
-                <RollingFile name="Rolling-Message" fileName="${log-path}/mqtt.log"
+        <RollingFile name="Rolling-Message" fileName="${log-path}/mqtt.log"
                      filePattern="${log-path}/mqtt-%d{yyyy-MM-dd}_(%i).log">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{1}): %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{3}): %msg%n</Pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -43,19 +44,19 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="gew.PubSub" level="info" additivity="false">
+        <Logger name="gew.pubsub" level="info" additivity="false">
             <AppenderRef ref="Rolling-File"/>
             <AppenderRef ref="Console-Appender"/>
         </Logger>
 
         <!-- MQTT Message Independent Rolling Log File -->
-        <Logger name="gew.PubSub.mqtt.ClientCallback" level="info" additivity="false">
+        <Logger name="gew.pubsub.mqtt.ClientCallback" level="info" additivity="false">
             <AppenderRef ref="Rolling-Message"/>
             <AppenderRef ref="Console-Appender"/>
         </Logger>
 
         <!-- MQTT Message Independent Rolling Log File -->
-        <Logger name="gew.PubSub.entity.DataReceiving" level="info" additivity="false">
+        <Logger name="gew.pubsub.service.DataReceiving" level="info" additivity="false">
             <AppenderRef ref="Rolling-Message"/>
             <AppenderRef ref="Console-Appender"/>
         </Logger>

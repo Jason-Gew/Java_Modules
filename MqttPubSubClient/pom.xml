@@ -7,7 +7,7 @@
     <groupId>gew</groupId>
     <artifactId>MqttPubSubClient</artifactId>
     <version>1.0.0</version>
-    <description>MQTT Pub Sub Client by Jason/GeW</description>
+    <description>Pub Sub Client Based on MQTT Protocol by Jason/GeW</description>
 
     <dependencies>
         <dependency>
@@ -16,15 +16,20 @@
             <version>1.2.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>2.10.0</version>
         </dependency>
 
-    </dependencies>
+        <!-- https://mvnrepository.com/artifact/org.json/json -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
+        </dependency>
 
+    </dependencies>
 
     <build>
         <plugins>
@@ -51,7 +56,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>gew.PubSub.Application</mainClass>
+                                    <mainClass>gew.pubsub.Application</mainClass>
                                 </transformer>
                             </transformers>
 

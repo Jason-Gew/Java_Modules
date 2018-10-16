@@ -1,26 +1,21 @@
-package gew.PubSub.config;
-
-
-import java.util.List;
+package gew.pubsub.config;
 
 /**
  * @author Jason/GeW
  */
-public class MqttClientConfig
-{
+public class MQTTClientConfig {
+
     private String broker;
     private Integer keepAlive;
     private Boolean cleanSession;
     private String clientID;
-    private Boolean autoReconnect;
+    private Integer maxInFlight;
     private Boolean enableLogin;
     private String username;
     private String password;
     private Boolean enableSSL;
     private Integer pubQos;
     private Integer subQos;
-    private List<String> autoPubTopics;
-    private List<String> autoSubTopics;
     private Boolean enableOutQueue;
 
     public String getBroker() { return broker; }
@@ -35,8 +30,8 @@ public class MqttClientConfig
     public String getClientID() { return clientID; }
     public void setClientID(final String clientID) { this.clientID = clientID; }
 
-    public Boolean getAutoReconnect() { return autoReconnect; }
-    public void setAutoReconnect(final Boolean autoReconnect) { this.autoReconnect = autoReconnect; }
+    public Integer getMaxInFlight() { return maxInFlight; }
+    public void setMaxInFlight(Integer maxInFlight) { this.maxInFlight = maxInFlight; }
 
     public Boolean getEnableLogin() { return enableLogin; }
     public void setEnableLogin(final Boolean enableLogin) { this.enableLogin = enableLogin; }
@@ -55,12 +50,6 @@ public class MqttClientConfig
 
     public Integer getSubQos() { return subQos; }
     public void setSubQos(final Integer subQos) { this.subQos = subQos; }
-
-    public List<String> getAutoPubTopics() { return autoPubTopics; }
-    public void setAutoPubTopics(List<String> autoPubTopics) { this.autoPubTopics = autoPubTopics; }
-
-    public List<String> getAutoSubTopics() { return autoSubTopics; }
-    public void setAutoSubTopics(List<String> autoSubTopics) { this.autoSubTopics = autoSubTopics; }
 
     public Boolean getEnableOutQueue() { return enableOutQueue; }
     public void setEnableOutQueue(final Boolean enableOutQueue) { this.enableOutQueue = enableOutQueue; }

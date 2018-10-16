@@ -1,97 +1,60 @@
-package gew.PubSub.mqtt;
+package gew.pubsub.mqtt;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 
 /**
- * MQTT Callback class, handle arriving message to message queue, etc.
+ * MQTT Callback class, handle arriving MQTTMessage to message queue, etc.
  * @author Jason/Ge Wu
  * @since 2017-08-01
  */
-public class ClientCallback implements MqttCallback
-{
+public class ClientCallback implements MqttCallback {
+
     private boolean queueEnable;
-    private MqttClient currentClient;
-    private int RECONNECT_TRIAL = 10;
-    private boolean autoReconnect = true;
-    private Queue<String[]> messageQueue;       // Producer; [0]: Topic, [1]: Payload
+    private MessageType messageType;
+    private Queue<MQTTMessage> messageQueue;
 
     private static final Logger logger = LogManager.getLogger(ClientCallback.class);
 
-    public ClientCallback(MqttClient currentClient) {
-        this.currentClient = currentClient;
+    public ClientCallback(MessageType messageType) {
         queueEnable = false;
+        this.messageType = messageType;
     }
 
-    ClientCallback(MqttClient currentClient, Queue<String[]> messageQueue) {
-        this.currentClient = currentClient;
-        this.messageQueue = messageQueue;
+    ClientCallback(Queue<MQTTMessage> messageQueue) {
         queueEnable = true;
+        this.messageQueue = messageQueue;
     }
-
-    public boolean isAutoReconnect() { return autoReconnect; }
-    public void setAutoReconnect(boolean autoReconnect) { this.autoReconnect = autoReconnect; }
 
     @Override
     public void connectionLost(Throwable throwable) {
         logger.info("=> MQTT Connection Lost: " + throwable.getMessage());
-        if (!autoReconnect) {
-            while (RECONNECT_TRIAL != 0 && !currentClient.isConnected()) {
-                try {
-                    logger.info("=> System is trying to reconnect... (" + RECONNECT_TRIAL + ")");
-                    currentClient.connect();            // or invoke reconnect()
-                    if (currentClient.isConnected()) {
-                        logger.info("=> System Reconnected!");
-                        RECONNECT_TRIAL = 10;
-                        break;
-                    }
-                } catch (MqttException e) {
-//                    RECONNECT_TRIAL++;
-                    logger.error("=> MQTT Reconnect: " + e.toString());
-                }
-                RECONNECT_TRIAL--;
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    logger.warn("=> MQTT Reconnection Interrupted: " + e.toString());
-                }
-            }
-        }
     }
 
     @Override
-    public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+    public void messageArrived(String topic, MqttMessage mqttMessage) {
         if (queueEnable) {
-            String[] data = new String[2];
-            String msg = null;
-            try {
-                msg = new String(mqttMessage.getPayload(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                logger.error(e.toString());
-            }
-            data[0] = topic;
-            data[1] = msg;
-            try {
-                messageQueue.add(data);
-            } catch(Exception err) {
-                logger.info(err.toString());
-            }
+            MQTTMessage message = new MQTTMessage(topic, mqttMessage.getPayload(), ZonedDateTime.now());
+            message.setMessageId(mqttMessage.getId());
+            messageQueue.add(message);
         } else {
             String msg = null;
-            try {
-                msg = new String(mqttMessage.getPayload(), "UTF-8");
-
-            } catch (UnsupportedEncodingException e) {
-                logger.error(e.toString());
+            if (messageType != null && (messageType == MessageType.PLAIN_TEXT
+                    || messageType == MessageType.JSON_STRING)) {
+                msg = new String(mqttMessage.getPayload(), StandardCharsets.UTF_8);
+            } else {
+                try {
+                    msg = new String(mqttMessage.getPayload(), StandardCharsets.UTF_8);
+                } catch (Exception err) {
+                    logger.error("=> Encode MQTT Message from Topic [{}] to String Failed: {}", topic, err.getMessage());
+                }
             }
             logger.info("=> Message From Topic [{}]:\n{}", topic, msg);
         }
@@ -99,7 +62,6 @@ public class ClientCallback implements MqttCallback
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        if (!autoReconnect && RECONNECT_TRIAL < 10)
-            RECONNECT_TRIAL = 10;
+        logger.debug("Message Delivery Complete");
     }
 }
