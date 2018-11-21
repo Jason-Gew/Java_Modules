@@ -8,7 +8,6 @@ import caching.memcache.util.ObjectEncoder;
 import caching.memcache.util.UniqueTranscoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.rubyeye.xmemcached.exception.MemcachedException;
 import net.rubyeye.xmemcached.transcoders.Transcoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Jason/GeW
@@ -27,7 +26,8 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws InterruptedException {
 
         MClientConfig config = new MClientConfig();
         config.setAddress(ADDRESS);
@@ -43,25 +43,26 @@ public class Main {
         }
 
         /* Get Normal String Value */
-        getString(cache, "test2");
+//        getString(cache, "test1");
 
         /* Set JSON Value in String */
-        Message message = new Message(123, "Hello World!", Instant.now().toString(),
-                Arrays.asList("Test", "Message", "List"));
-        setJson(cache, "test3", message);
+        Message message = new Message(123456, "Hello World!", Instant.now().toString(),
+                Arrays.asList("Test", "Message", "List", "Var"));
+        setJson(cache, "test-json", message);
 
         /* Set Serialize Object and Encode */
-        setSerializedObject(cache, "test9", message);
+        setSerializedObject(cache, "test-object", message);
 
+        Thread.sleep(500);
         /* Get Serialized Object and Decode */
-        getAndDeserializeObject(cache, "test9");
+        getAndDeserializeObject(cache, "test-object");
 
         //  According to the test, storing Object content in JSON format occupies less memory, then byte array.
         //  Keep object serialized and encoded to String by Base64 occupies the highest memory.
 
         //  Get the value from memcached which is set by the C# Enyim client. It does not support GZIP Flag,
         //  So that we have to re-write StringTranscoder or Any Unique Transcoder which extends PrimitiveTypeTranscoder.
-        getValueByUniqueTranscoder(cache, "test01", new UniqueTranscoder());
+        getValueByUniqueTranscoder(cache, "test-c#", new UniqueTranscoder());
 
         cache.close();
     }
@@ -98,7 +99,7 @@ public class Main {
     private static void setSerializedObject(MClient cache, String key, Message message) {
 
         try {
-            boolean status = cache.set(key, ObjectEncoder.encodeToByteArray(message));
+            boolean status = cache.set(key, ObjectEncoder.encodeToByteArray(message), 1, TimeUnit.HOURS);
             logger.info("Set Serialized Object for Key [{}] Result: {}", key, status);
 
         } catch (Exception e) {
@@ -112,11 +113,11 @@ public class Main {
             Optional<byte[]> value = cache.get(key);
             if (value.isPresent()) {
                 Message message = (Message) ObjectEncoder.decodeFromByteArray(value.get());
-                logger.info("Get Message: " + message.toString());
+                logger.info("Get De-Serialized Message for key [{}]: {}", key, message.toString());
             }
         } catch (Exception e) {
             if (e instanceof NullPointerException) {
-                logger.error("Value for Key [{}] Does Not Exist...", key);
+                logger.error("De-Serialized Value for Key [{}] Does Not Exist...", key);
             } else {
                 logger.error(e.getMessage());
             }
@@ -127,9 +128,9 @@ public class Main {
         try {
             Optional<Object> value = cache.get(key, transcoder);
             if (value.isPresent()) {
-                System.out.println(value.get());
+                logger.info("Get Unique Transcoder Value For Key [" + key + "]: " + value.get());
             } else {
-                logger.warn("Value for Key [{}] Does Not Exist!", key);
+                logger.warn("Unique Transcoder Value for Key [{}] Does Not Exist!", key);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

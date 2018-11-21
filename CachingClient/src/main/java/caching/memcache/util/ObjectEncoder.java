@@ -39,7 +39,6 @@ public class ObjectEncoder {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(arrayObject);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
-        Object object = objectInputStream.readObject();
-        return object;
+        return objectInputStream.readObject();
     }
 }
