@@ -1,5 +1,5 @@
 #  < Memcached Client >
-================
+
                                                                                               By Jason/GeW
 
 `1.` Memcached Singleton client bases on XMemcashed client, a personal wrapper.
