@@ -1,7 +1,7 @@
 ****** Kafka Client ******
 ==================================
 
-                                                                       By Jason/GeW
+                                                                                                By Jason/GeW
 
 
 The Basic Kafka Client (Producer and Consumer) based on Apache Kafka-Client V1.0.0.
