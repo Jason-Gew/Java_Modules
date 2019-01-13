@@ -12,7 +12,7 @@
         </Console>
 
         <RollingFile name="Rolling-File" fileName="${log-path}/${app-name}.log"
-                     filePattern="${log-path}/${app-names}-%d{yyyy-MM-dd}_(%i).log">
+                     filePattern="${log-path}/${app-name}-%d{yyyy-MM-dd}_(%i).log">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{3}): %msg%n</Pattern>
             </PatternLayout>

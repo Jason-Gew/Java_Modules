@@ -6,14 +6,14 @@
     <Appenders>
         <Console name="Console-Appender" target="SYSTEM_OUT">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{1}: %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] %c{3}: %msg%n</Pattern>
             </PatternLayout>
         </Console>
 
         <RollingFile name="Rolling-File" fileName="${log-path}/ftp.log"
                      filePattern="${log-path}/ftp-%d{yyyy-MM-dd}_(%i).log">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{1}): %msg%n</Pattern>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%t] (%c{3}): %msg%n</Pattern>
             </PatternLayout>
             <Policies>
                 <TimeBasedTriggeringPolicy />
