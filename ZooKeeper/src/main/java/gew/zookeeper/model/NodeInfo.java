@@ -20,9 +20,9 @@ public class NodeInfo implements Serializable {
     private Integer id;
     private String name;
     private String version;
-    private Integer sequence;
     private Map<String, String> info;                       // Addition Information
     private String timestamp = Instant.now().toString();    // UTC Timestamp
+    private String timezone;                                // Timezone Offset (Ex. -06:00, +08:00)
 
     private static final long serialversionUID = 20181220L;
 

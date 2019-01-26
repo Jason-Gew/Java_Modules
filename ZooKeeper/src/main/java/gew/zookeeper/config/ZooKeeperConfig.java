@@ -20,7 +20,13 @@ public class ZooKeeperConfig {
     private String authInfo;
     private Integer timeout = 4000;
     private Boolean readOnly = false;
+    private NodeMode nodeMode;
     private Boolean sequentialMode = false;
     private Boolean enableWatching = false;
     private Boolean enableAdvancedWatcher;
+
+    public enum NodeMode{
+        SERVER,
+        CLIENT
+    }
 }

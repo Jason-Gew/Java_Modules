@@ -8,7 +8,11 @@ import gew.zookeeper.model.ZKData;
 import gew.zookeeper.util.JSONMapper;
 import lombok.extern.log4j.Log4j2;
 
-import org.apache.zookeeper.*;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
 import java.io.IOException;
@@ -35,6 +39,8 @@ public class NodeManager implements ZKClient {
 
     private static ZooKeeperConfig ZK_CONFIG;
     private static volatile NodeManager CLIENT;
+    private static final String NODE_SEQUENCE_DELIMITER = "-";
+
 
     private NodeManager() {
         if (ZK_CONFIG == null || ZK_CONFIG.getHost() == null) {
@@ -54,6 +60,10 @@ public class NodeManager implements ZKClient {
         return CLIENT;
     }
 
+    public static ZooKeeperConfig getZkConfig() {
+        return ZK_CONFIG;
+    }
+
     public static void setZkConfig(ZooKeeperConfig zkConfig) {
         ZK_CONFIG = zkConfig;
     }
@@ -62,9 +72,14 @@ public class NodeManager implements ZKClient {
         return currentNodePath;
     }
 
+    public NodeInfo getCurrentNodeInfo() {
+        return currentNodeInfo;
+    }
+
     public void setDataQueue(final Queue<ZKData> dataQueue) {
         this.dataQueue = dataQueue;
     }
+
 
     @Override
     public ZooKeeper.States getStatus() {
@@ -78,9 +93,31 @@ public class NodeManager implements ZKClient {
             log.warn("ZooKeeper Client is Connecting or Connected!");
             return false;
         }
-        NodeWatcher watcher = new NodeWatcher(ZK_CONFIG.getRoot(), initialSignal);
+        SessionWatcher watcher = new SessionWatcher(zkClient, initialSignal, ZK_CONFIG);
+        watcher.setAutoReconnect(true);
         zkClient = new ZooKeeper(ZK_CONFIG.getHost(), ZK_CONFIG.getTimeout(), watcher, ZK_CONFIG.getReadOnly());
         initialSignal.await();
+        return ZooKeeper.States.CONNECTED.equals(zkClient.getState());
+    }
+
+    @Override
+    public boolean reconnect(SessionWatcher watcher, ZooKeeperConfig config) throws IOException {
+        if (zkClient != null && ZooKeeper.States.CONNECTED == zkClient.getState()) {
+            disconnect();
+        }
+        if (watcher.getCountDownLatch() == null || watcher.getCountDownLatch().getCount() != 1) {
+            throw new IllegalArgumentException("Invalid CountDown Setting in Watcher");
+        }
+        if (config != null) {
+            zkClient = new ZooKeeper(config.getHost(), config.getTimeout(), watcher, config.getReadOnly());
+        } else {
+            zkClient = new ZooKeeper(ZK_CONFIG.getHost(), ZK_CONFIG.getTimeout(), watcher, ZK_CONFIG.getReadOnly());
+        }
+        try {
+            watcher.getCountDownLatch().await();
+        } catch (InterruptedException e) {
+            log.error("Reconnection Await Got Interrupted!");
+        }
         return ZooKeeper.States.CONNECTED.equals(zkClient.getState());
     }
 
@@ -95,8 +132,8 @@ public class NodeManager implements ZKClient {
             }
             info = JSONMapper.serialize(nodeInfo).getBytes(StandardCharsets.UTF_8);
             if (ZK_CONFIG.getSequentialMode()) {
-                path = zkClient.create(ZK_CONFIG.getRoot() + "/" + nodeInfo.getName() + "-", info,
-                        ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+                path = zkClient.create(ZK_CONFIG.getRoot() + "/" + nodeInfo.getName() + NODE_SEQUENCE_DELIMITER,
+                        info, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
             } else {
                 String absolutePath = ZK_CONFIG.getRoot() + "/" + nodeInfo.getName();
                 if (existPath(absolutePath).isPresent()) {
@@ -181,18 +218,28 @@ public class NodeManager implements ZKClient {
         if (ZK_CONFIG.getEnableWatching()) {
             NodeWatcher watcher = new NodeWatcher(ZK_CONFIG.getRoot(), zkClient);
             watcher.enableWatching(ZK_CONFIG.getEnableWatching());
-            children = zkClient.getChildren(rootPath, watcher);
+            watcher.setWatcherName("ListNode");
+            return listNodes(rootPath, watcher);
         } else {
             children = zkClient.getChildren(rootPath, false);
         }
-        List<String> nodes = new ArrayList<>();
-        for (String child : children) {
-            byte[] data = zkClient.getData(rootPath + "/" + child, false, null);
-            nodes.add(new String(data, StandardCharsets.UTF_8));
-        }
-        return nodes;
+        return children;
     }
 
+    public List<String> listNodes(final String rootPath, NodeWatcher watcher) throws KeeperException, InterruptedException {
+        List<String> children;
+        if (watcher != null) {
+            children = zkClient.getChildren(rootPath, watcher);
+        } else {
+            children = zkClient.getChildren(rootPath, true);
+        }
+//        List<String> nodes = new ArrayList<>();
+//        for (String child : children) {
+//            byte[] data = zkClient.getData(rootPath + "/" + child, false, null);
+//            nodes.add(new String(data, StandardCharsets.UTF_8));
+//        }
+        return children;
+    }
 
     @Override
     public Optional<Stat> existPath(final String path) {
@@ -219,9 +266,10 @@ public class NodeManager implements ZKClient {
                 zkClient.close();
                 log.debug("ZooKeeper Client Disconnected");
             }
-            zkClient = null;
         } catch (InterruptedException e) {
             log.error("Closing ZooKeeper Client Got Interrupted!");
+        } finally {
+            zkClient = null;
         }
     }
 

@@ -7,7 +7,7 @@
     <groupId>gew</groupId>
     <artifactId>zookeeper</artifactId>
     <version>1.0.0</version>
-    <description>Distributed System Dynamic Management Based on ZooKeeper</description>
+    <description>Distributed System Dynamic Manager Based on ZooKeeper</description>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->

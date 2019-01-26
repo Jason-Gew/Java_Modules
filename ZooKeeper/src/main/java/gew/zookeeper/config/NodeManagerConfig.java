@@ -3,6 +3,8 @@ package gew.zookeeper.config;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @author Jason/GeW
  */
@@ -13,6 +15,6 @@ public class NodeManagerConfig {
     private Integer id;
     private String name;
     private String timezoneOffset;
-    private Integer[] ports;    // ports split by ',' without space
+    private List<Integer> ports;    // ports split by ',' without space
     private String notes;
 }

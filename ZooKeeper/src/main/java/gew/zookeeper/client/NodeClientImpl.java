@@ -60,11 +60,35 @@ public class NodeClientImpl implements NodeClient, Callable<ZKData> {
             log.warn("ZooKeeper Client is Connecting or Connected!");
             return false;
         } else {
-            NodeWatcher watcher = new NodeWatcher(zooKeeperConfig.getRoot(), initialSignal);
-            zkClient = new ZooKeeper(zooKeeperConfig.getHost(), zooKeeperConfig.getTimeout(), watcher, true);
+            SessionWatcher watcher = new SessionWatcher(zkClient, initialSignal, zooKeeperConfig);
+            watcher.setAutoReconnect(true);
+            zkClient = new ZooKeeper(zooKeeperConfig.getHost(), zooKeeperConfig.getTimeout(),
+                    watcher, zooKeeperConfig.getReadOnly());
             initialSignal.await();
-            return ZooKeeper.States.CONNECTED.equals(zkClient.getState());
+            return ZooKeeper.States.CONNECTED == zkClient.getState();
         }
+    }
+
+    @Override
+    public boolean reconnect(SessionWatcher watcher, ZooKeeperConfig config) throws IOException {
+        if (zkClient != null) {
+            disconnect();
+        }
+        if (watcher.getCountDownLatch() == null || watcher.getCountDownLatch().getCount() != 1) {
+            throw new IllegalArgumentException("Invalid CountDown Setting in Watcher");
+        }
+        if (config != null) {
+            zkClient = new ZooKeeper(config.getHost(), config.getTimeout(), watcher, config.getReadOnly());
+        } else {
+            zkClient = new ZooKeeper(zooKeeperConfig.getHost(), zooKeeperConfig.getTimeout(),
+                    watcher, zooKeeperConfig.getReadOnly());
+        }
+        try {
+            initialSignal.await();
+        } catch (InterruptedException e) {
+            log.error("Reconnection Await Got Interrupted!");
+        }
+        return ZooKeeper.States.CONNECTED.equals(zkClient.getState());
     }
 
     @Override
@@ -99,6 +123,14 @@ public class NodeClientImpl implements NodeClient, Callable<ZKData> {
     @Override
     public List<String> listNodes(String rootPath) throws KeeperException, InterruptedException {
         return zkClient.getChildren(rootPath, false);
+    }
+
+    @Override
+    public List<String> listNodes(String rootPath, NodeWatcher watcher) throws KeeperException, InterruptedException {
+        if (watcher.getZkClient() == null) {
+            watcher.setZkClient(zkClient);
+        }
+        return zkClient.getChildren(rootPath, watcher);
     }
 
     @Override
@@ -163,6 +195,11 @@ public class NodeClientImpl implements NodeClient, Callable<ZKData> {
     }
 
 
+    /**
+     * Async One Time Call to Get ZooKeeper Node Information
+     * @return ZKData, Current Node Information under ZooKeeper Certain Path
+     * @throws Exception KeeperException, InterruptException
+     */
     @Override
     public ZKData call() throws Exception {
         try {

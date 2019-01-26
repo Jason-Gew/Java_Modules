@@ -7,7 +7,6 @@ import org.apache.zookeeper.ZooKeeper;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Jason/GeW
@@ -17,19 +16,21 @@ import java.util.concurrent.CountDownLatch;
 public class NodeWatcher implements Watcher {
 
     final String root;
-    ZooKeeper zkClient;
-    CountDownLatch countDownLatch;
+    volatile ZooKeeper zkClient;
+    private String watcherName;
     private boolean enableWatching;
+
+    public NodeWatcher(String root) {
+        this.root = root;
+        this.watcherName = "Default";
+    }
 
     public NodeWatcher(String root, ZooKeeper zkClient) {
         this.root = root;
         this.zkClient = zkClient;
+        this.watcherName = "Default";
     }
 
-    public NodeWatcher(String root, CountDownLatch countDownLatch) {
-        this.root = root;
-        this.countDownLatch = countDownLatch;
-    }
 
     public ZooKeeper getZkClient() {
         return zkClient;
@@ -37,6 +38,14 @@ public class NodeWatcher implements Watcher {
 
     public void setZkClient(ZooKeeper zkClient) {
         this.zkClient = zkClient;
+    }
+
+    public String getWatcherName() {
+        return watcherName;
+    }
+
+    public void setWatcherName(String watcherName) {
+        this.watcherName = watcherName;
     }
 
     public boolean isEnableWatching() {
@@ -53,16 +62,17 @@ public class NodeWatcher implements Watcher {
 
 
     public void process(WatchedEvent watchedEvent) {
-        log.info("Watcher [{}] -> Path \"{}\": Type: {}, State: {}", root, watchedEvent.getPath(),
-                watchedEvent.getType(), watchedEvent.getState());
-        if (countDownLatch != null && countDownLatch.getCount() > 0
-                && watchedEvent.getState().equals(Event.KeeperState.SyncConnected)) {
-            countDownLatch.countDown();
-            log.debug("Watcher Count Down! Total: {}", countDownLatch.getCount());
+        if (watcherName != null && !watcherName.isEmpty()) {
+            log.info("Watcher [{}] -> Path \"{}\": Type: {}, State: {}", watcherName, watchedEvent.getPath(),
+                    watchedEvent.getType(), watchedEvent.getState());
+        } else {
+            log.info("Watcher [{}] -> Path \"{}\": Type: {}, State: {}", root, watchedEvent.getPath(),
+                    watchedEvent.getType(), watchedEvent.getState());
         }
-        if (enableWatching) {
+        if (enableWatching && Event.EventType.NodeChildrenChanged == watchedEvent.getType()) {
             Optional<List<String>> nodes = listNodes();
-            log.info("Watcher [{}] Get Current Nodes: {}", root, nodes.isPresent() ? nodes.get() : "Failed!");
+            log.info("Watcher [{}] Get Current Nodes: {}", watcherName == null ? root : watcherName,
+                    nodes.isPresent() ? nodes.get() : "Failed!");
         }
     }
 
@@ -70,9 +80,9 @@ public class NodeWatcher implements Watcher {
     private Optional<List<String>> listNodes() {
         Optional<List<String>> nodes = Optional.empty();
         try {
-            nodes = Optional.of(zkClient.getChildren(root, true));
+            nodes = Optional.of(zkClient.getChildren(root, this));          // Pass Current NodeWatcher Object
         } catch (Exception err) {
-            log.error("Watcher [{}] Get Sub Nodes Failed: {}", root, err.getMessage());
+            log.error("Watcher [{}] Get Sub Nodes Failed: {}", watcherName == null ? root : watcherName, err.getMessage());
         }
         return nodes;
     }
