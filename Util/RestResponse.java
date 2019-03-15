@@ -2,6 +2,8 @@
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.time.Instant;
+
 
 /**
  * REST Response for formatting to a unified HTTP Response.
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestResponse {
+
     private Integer code;
     private Status status;
     private String message;
@@ -19,17 +22,26 @@ public class RestResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object result;
 
-    public RestResponse() { }
+    public RestResponse() {
+
+    }
+
+    public RestResponse(Integer code, Status status, String message) {
+        this.code = code;
+        this.status = status;
+        this.message = message;
+        this.timestamp = Instant.now().toString();
+    }
 
     public RestResponse(Integer code, Status status, String message, Object result) {
         this.code = code;
         this.status = status;
         this.message = message;
         this.result = result;
+        this.timestamp = Instant.now().toString();
     }
 
-    public RestResponse(Integer code, Status status, String message, String timestamp, Object result)
-    {
+    public RestResponse(Integer code, Status status, String message, String timestamp, Object result) {
         this.code = code;
         this.status = status;
         this.message = message;
@@ -37,13 +49,13 @@ public class RestResponse {
         this.timestamp = timestamp;
     }
 
-    public RestResponse(Integer code, Status status, String message, Integer count, Object result)
-    {
+    public RestResponse(Integer code, Status status, String message, Integer count, Object result) {
         this.code = code;
         this.status = status;
         this.message = message;
         this.count = count;
         this.result = result;
+        this.timestamp = Instant.now().toString();
     }
 
     public Integer getCode() { return code; }
