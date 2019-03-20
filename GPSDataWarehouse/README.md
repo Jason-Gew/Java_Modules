@@ -19,13 +19,14 @@
 
 *  Support GPS data query based on datetime range [(start: 2018-10-18, end: 2019-01-01), (start: 1539129600, end: 1546300800)].
 
-*  Support _csv_, _xls_, _xlsx_ GPS data file (with correct header/column name line) uploading, reading and insertion.
+*  Support _csv_, _json_, _xml_ GPS data file (with correct header/column name line) uploading, reading and insertion.
 
 *  Will support streaming data integration.
 
 
 
-<center>`This project is under continous integration process!`</center>
+
+`This project is under continous integration process!`
 
 
 
