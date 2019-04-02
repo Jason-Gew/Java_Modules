@@ -3,6 +3,8 @@ package gew.data.warehouse.gps.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gew.data.warehouse.gps.util.DatetimeConverter;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,11 +37,13 @@ public class GPSData implements Serializable {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private DeviceUser user;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "config", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private DeviceConfig config;
 
     @Size(max = 255)
