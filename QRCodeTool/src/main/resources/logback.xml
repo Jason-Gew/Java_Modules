@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="600 second">
+
+    <!--Log Related Property-->
+    <property name="log-path" value="logs" />
+    <Property name="app-name" value="QRTool" />
+
+    <!--Rolling Log Appender Based on Datetime and File Size-->
+    <appender name="rolling-appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log-path}/${app-name}.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%t] %logger{36}: %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>"${log-path}/${app-name}-%d{yyyy-MM-dd}.%i.log"</fileNamePattern>
+            <maxHistory>5</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!--Console Appender-->
+    <appender name="console-appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <!--<withJansi>true</withJansi>-->
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} %highlight([%-5level]) %boldYellow(%t) | %boldGreen(%logger{35}): %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <!--Logger Starts From Here-->
+    <logger name="gew.qrcode" level="info" additivity="false">
+        <appender-ref ref="rolling-appender" />
+        <appender-ref ref="console-appender" />
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="console-appender" />
+        <appender-ref ref="rolling-appender" />
+    </root>
+
+</configuration>
