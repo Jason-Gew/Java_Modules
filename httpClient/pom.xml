@@ -9,6 +9,11 @@
     <version>1.0-SNAPSHOT</version>
     <description>Sample utilization of some lightweight HTTP clients.</description>
 
+    <properties>
+        <jackson.version>2.9.9</jackson.version>
+        <log4j.version>2.11.2</log4j.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -29,19 +34,19 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.9.8</version>
+            <version>${jackson.version}</version>
         </dependency>
 
 
