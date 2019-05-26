@@ -82,9 +82,9 @@ public class HashUtil {
         StringBuilder sb = new StringBuilder();
         Arrays.stream(content).filter(s -> s != null && s.length() > 0).forEach(sb::append);
         try {
-            MessageDigest md5 = MessageDigest.getInstance(algorithm);
-            md5.update(sb.toString().getBytes(StandardCharsets.UTF_8));
-            return md5.digest();
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            md.update(sb.toString().getBytes(StandardCharsets.UTF_8));
+            return md.digest();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return sb.toString().getBytes();
