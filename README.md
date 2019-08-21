@@ -1,18 +1,20 @@
 # Java Fundamental Modules and Initial Projects
 
-Personal Java 8 modules and projects for further integration and basic usage.
+
+Personal Java modules and projects for further integration and basic usage.
+
 
 ## Getting Started
 
-Most of the Java 8 code are based on Maven for better dependency management and version control. Part of them utilize Spring Boot framework for wide usage.
+Most of the Java project code are based on ___Maven___ for better dependency management and version control. Part of them utilize Spring Boot framework for wide usage.
 
 ### Prerequisites
 
 ```
-unzip apache-maven-3.5.4-bin.zip
+unzip apache-maven-3.6.1-bin.zip
 ```
 ```
-export PATH=/opt/apache-maven-3.5.4/bin:$PATH
+export PATH=/opt/apache-maven-3.6.1/bin:$PATH
 ```
 
 ### Installing
@@ -28,7 +30,7 @@ mvn install
 
 ## Contents
 
-`1.` See Directory...
+`1.` See Each Directory...
 
 
 ## Built With
