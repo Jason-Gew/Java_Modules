@@ -9,7 +9,7 @@
     <version>1.0.0</version>
 
     <properties>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.9.10</jackson.version>
         <log4j.version>2.11.2</log4j.version>
     </properties>
 
