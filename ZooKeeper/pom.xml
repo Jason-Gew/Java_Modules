@@ -10,7 +10,7 @@
     <description>Distributed System Dynamic Manager Based on ZooKeeper</description>
 
     <properties>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.10.3</jackson.version>
         <log4j.version>2.11.2</log4j.version>
     </properties>
 
