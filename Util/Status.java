@@ -6,7 +6,9 @@
 public enum Status {
 
     SUCCESS("Success"),
+
     FAIL("Fail"),
+    
     UNKNOWN("Unknown");
 
     private final String name;
