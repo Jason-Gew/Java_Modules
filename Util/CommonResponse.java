@@ -1,8 +1,8 @@
-package gew.nodemanager.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -10,7 +10,7 @@ import java.time.Instant;
  * @author Jason/GeW
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CommonResponse<T> {
+public class CommonResponse<T> implements Serializable {
 
     private Integer code;
 
@@ -24,8 +24,20 @@ public class CommonResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T result;
 
+    private Boolean success
+
+
     public CommonResponse() {
 
+    }
+
+    public CommonResponse(T result) {
+        this.code = 200;
+        this.status = Status.SUCCESS;
+        this.message = "Operation Success";
+        this.result = result;
+        this.success = true;
+        this.timestamp = Instant.now().toString();
     }
 
     public CommonResponse(Integer code, Status status, String message) {
@@ -33,6 +45,7 @@ public class CommonResponse<T> {
         this.status = status;
         this.message = message;
         this.timestamp = Instant.now().toString();
+        this.success = status == Status.SUCCESS ? true : false;
     }
 
     public CommonResponse(Integer code, Status status, String message, T result) {
@@ -41,6 +54,7 @@ public class CommonResponse<T> {
         this.message = message;
         this.result = result;
         this.timestamp = Instant.now().toString();
+        this.success = status == Status.SUCCESS ? true : false;
     }
 
     public CommonResponse(Integer code, Status status, String message, T result, String timestamp) {
@@ -49,6 +63,7 @@ public class CommonResponse<T> {
         this.message = message;
         this.result = result;
         this.timestamp = timestamp;
+        this.success = status == Status.SUCCESS ? true : false;
     }
 
     public Integer getCode() { return code; }
@@ -66,6 +81,13 @@ public class CommonResponse<T> {
     public T getResult() { return result; }
     public void setResult(T result) { this.result = result; }
 
+    public Boolean getSuccess() {
+        return success;
+    }
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+
     @Override
     public String toString() {
         return "CommonResponse{" +
@@ -74,6 +96,7 @@ public class CommonResponse<T> {
                 ", message='" + message + '\'' +
                 ", timestamp='" + timestamp + '\'' +
                 ", result=" + result +
+                ", success=" + success +
                 '}';
     }
 }
