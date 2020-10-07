@@ -10,8 +10,8 @@
     <description>Java Taking Photo By Web Camera</description>
 
     <properties>
-        <jackson.version>2.10.3</jackson.version>
-        <log4j.version>2.11.2</log4j.version>
+        <jackson.version>2.11.3</jackson.version>
+        <log4j.version>2.13.3</log4j.version>
     </properties>
 
 
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180130</version>
+            <version>20200518</version>
         </dependency>
 
         <!-- Jackson JSON Library -->
