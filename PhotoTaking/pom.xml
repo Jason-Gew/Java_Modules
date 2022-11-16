@@ -10,7 +10,7 @@
     <description>Java Taking Photo By Web Camera</description>
 
     <properties>
-        <jackson.version>2.11.3</jackson.version>
+        <jackson.version>2.12.7.1</jackson.version>
         <log4j.version>2.13.3</log4j.version>
     </properties>
 
